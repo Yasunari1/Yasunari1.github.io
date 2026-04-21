@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolicyRadar · 赵宸昊</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FDF6EE;
+    --card-bg: #FFFFFF;
+    --text-primary: #2D2018;
+    --text-secondary: #7A6A5A;
+    --text-muted: #A8977E;
+    --accent: #D4663A;
+    --accent-glow: rgba(212, 102, 58, 0.10);
+    --accent2: #2A9D8F;
+    --accent3: #C44536;
+    --accent4: #E4A853;
+    --border: #E8DDD0;
+    --border-hover: #D4C4B0;
+    --green: #2A9D8F;
+    --yellow: #E4A853;
+    --red: #C44536;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans SC',sans-serif; background:var(--bg); color:var(--text-primary); line-height:1.8; -webkit-font-smoothing:antialiased; }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { opacity:.7; }
+
+  .ambient { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .amb { position:absolute; border-radius:50%; filter:blur(120px); opacity:.1; }
+  .amb:nth-child(1) { width:500px; height:500px; background:var(--accent); top:-150px; right:-80px; }
+  .amb:nth-child(2) { width:350px; height:350px; background:var(--accent4); bottom:10%; left:-60px; }
+  .amb:nth-child(3) { width:300px; height:300px; background:var(--accent2); top:50%; right:20%; }
+
+  .wrap { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:0 48px; }
+
+  /* Nav */
+  .nav { padding:32px 0; display:flex; align-items:center; gap:8px; }
+  .nav a { font-size:13px; color:var(--text-muted); transition:color .3s; }
+  .nav a:hover { color:var(--accent); opacity:1; }
+
+  /* Hero */
+  .hero { padding:20px 0 48px; }
+  .hero-type { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); font-weight:500; margin-bottom:12px; }
+  .hero h1 { font-family:'DM Serif Display',serif; font-size:40px; font-weight:400; line-height:1.2; margin-bottom:16px; }
+  .hero-sub { font-size:16px; color:var(--text-secondary); font-weight:300; line-height:1.9; max-width:640px; }
+  .hero-meta { display:flex; gap:24px; margin-top:20px; flex-wrap:wrap; }
+  .hm { font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+  .hm-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); opacity:.5; }
+
+  /* Metrics banner */
+  .metrics-bar {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:16px; padding:28px 32px; margin-bottom:56px;
+  }
+  .mb-item { text-align:center; }
+  .mb-val { font-family:'DM Serif Display',serif; font-size:28px; font-weight:700; color:var(--accent); }
+  .mb-lbl { font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+  /* Section */
+  .sec { margin-bottom:52px; }
+  .sec-h { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .sec-num { font-family:'DM Serif Display',serif; font-size:24px; color:var(--accent); opacity:.3; }
+  .sec-title { font-size:18px; font-weight:700; }
+  .sec p { font-size:14.5px; color:var(--text-secondary); line-height:1.9; font-weight:300; margin-bottom:16px; }
+  .sec p strong { color:var(--text-primary); font-weight:600; }
+
+  /* Highlight box */
+  .hbox {
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:14px; padding:24px 28px; margin:20px 0;
+  }
+  .hbox-title { font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent); }
+  .hbox p { margin-bottom:0; }
+
+  /* Step flow */
+  .flow { display:flex; flex-direction:column; gap:0; margin:24px 0; }
+  .flow-step { display:flex; gap:20px; position:relative; }
+  .flow-line { display:flex; flex-direction:column; align-items:center; width:32px; flex-shrink:0; }
+  .flow-dot { width:12px; height:12px; border-radius:50%; border:2px solid var(--accent); background:var(--bg); z-index:1; flex-shrink:0; }
+  .flow-dot.filled { background:var(--accent); }
+  .flow-track { width:2px; flex:1; background:var(--border); }
+  .flow-body { padding:0 0 32px; flex:1; }
+  .flow-label { font-size:13px; font-weight:600; margin-bottom:4px; }
+  .flow-desc { font-size:13px; color:var(--text-secondary); font-weight:300; line-height:1.7; }
+
+  /* Tech tags */
+  .ttags { display:flex; gap:8px; flex-wrap:wrap; margin:16px 0; }
+  .tt { font-size:12px; padding:5px 14px; border-radius:8px; border:1px solid var(--border); color:var(--text-secondary); background:var(--card-bg); }
+
+  /* === Interactive Demo === */
+  .demo-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 24px 0;
+  }
+  .demo-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .demo-header-dot { width:8px; height:8px; border-radius:50%; }
+  .demo-header-title { font-size:13px; color:var(--text-muted); font-weight:500; }
+
+  .demo-body { padding: 24px; }
+
+  /* Source selector */
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .source-chip {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s;
+    user-select: none;
+    background: var(--bg);
+  }
+  .source-chip:hover { border-color: var(--accent); }
+  .source-chip.active {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+    color: var(--text-primary);
+  }
+  .source-chip .chip-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+    flex-shrink: 0;
+  }
+  .source-chip.active .chip-dot { background: var(--accent); }
+
+  /* Crawl animation */
+  .crawl-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 24px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+  }
+  .crawl-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .crawl-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .crawl-btn .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: none;
+  }
+  .crawl-btn.loading .spinner { display: block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Log stream */
+  .log-panel {
+    background: #1a1612;
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #a8977e;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .log-panel.visible { display: block; }
+  .log-line { opacity: 0; animation: fadeIn 0.3s forwards; }
+  .log-line .time { color: #5a5040; }
+  .log-line .ok { color: var(--green); }
+  .log-line .warn { color: var(--yellow); }
+  .log-line .url { color: #c4a87a; }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  /* Policy cards */
+  .policy-results { display: none; }
+  .policy-results.visible { display: block; }
+  .policy-results-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .policy-results-title .count {
+    font-size: 11px;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .policy-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    background: var(--bg);
+    opacity: 0;
+    transform: translateY(12px);
+    animation: cardIn 0.4s forwards;
+  }
+  @keyframes cardIn { to { opacity:1; transform:translateY(0); } }
+
+  .policy-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+  .policy-card-title { font-size: 14px; font-weight: 600; line-height: 1.6; flex:1; }
+  .rel-badge {
+    flex-shrink: 0;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .rel-high { background: rgba(42,157,143,0.12); color: var(--green); }
+  .rel-mid { background: rgba(228,168,83,0.15); color: #b8860b; }
+  .rel-low { background: rgba(196,69,54,0.1); color: var(--red); }
+
+  .policy-card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .policy-card-analysis {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+  .policy-card-analysis strong { color: var(--text-primary); font-weight:500; }
+
+  /* AI analysis typing */
+  .ai-label {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+    display: none;
+  }
+  .stats-bar.visible { display: grid; }
+  .stat-item {
+    text-align: center;
+    padding: 16px;
+    background: var(--card-bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .stat-val { font-family:'DM Serif Display',serif; font-size: 24px; color: var(--accent); }
+  .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Footer */
+  .foot { padding:48px 0 56px; text-align:center; border-top:1px solid var(--border); margin-top:20px; }
+  .foot a { font-size:14px; color:var(--accent); font-weight:500; display:inline-flex; align-items:center; gap:6px; }
+
+  @media(max-width:640px) {
+    .wrap { padding:0 24px; }
+    .hero h1 { font-size:28px; }
+    .metrics-bar { grid-template-columns:repeat(2,1fr); gap:12px; padding:20px 24px; }
+    .source-grid { grid-template-columns:repeat(2,1fr); }
+    .stats-bar { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="ambient"><div class="amb"></div><div class="amb"></div><div class="amb"></div></div>
+<div class="wrap">
+
+<!-- Breadcrumb -->
+<nav class="nav">
+  <a href="../index.html">← 返回作品集</a>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-type">AI 辅助政策分析工具</div>
+  <h1>PolicyRadar</h1>
+  <p class="hero-sub">通过爬虫采集十余个政府网站政策数据，接入 DeepSeek API 逐条判断与集团业务的相关性，自动生成结构化指引——已融入团队季度工作流程。</p>
+  <div class="hero-meta">
+    <div class="hm"><span class="hm-dot"></span>2025</div>
+    <div class="hm"><span class="hm-dot"></span>独立负责</div>
+    <div class="hm"><span class="hm-dot"></span>爬虫 + LLM + 自动化</div>
+  </div>
+</header>
+
+<!-- Metrics -->
+<div class="metrics-bar">
+  <div class="mb-item"><div class="mb-val">12+</div><div class="mb-lbl">政府网站数据源</div></div>
+  <div class="mb-item"><div class="mb-val">300+</div><div class="mb-lbl">政策条目采集</div></div>
+  <div class="mb-item"><div class="mb-val">~90%</div><div class="mb-lbl">AI 筛选准确率</div></div>
+  <div class="mb-item"><div class="mb-val">季度</div><div class="mb-lbl">融入团队工作流</div></div>
+</div>
+
+<!-- Problem -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">01</span><span class="sec-title">问题发现</span></div>
+  <p>大型集团企业需要持续跟踪国家及地方政策动态，以便及时把握财政补贴、税收优惠和产业扶持等机遇。但现有方式存在明显痛点：</p>
+  <div class="hbox">
+    <div class="hbox-title">痛点一 · 信息来源分散</div>
+    <p>财政部、工信部、发改委、国家税务总局等十余个政府网站各自发布政策，人工逐一浏览耗时巨大。</p>
+  </div>
+  <div class="hbox">
+    <div class="hbox-title">痛点二 · 关联判断主观低效</div>
+    <p>每条政策是否与集团业务相关，需要阅读全文后综合判断。人工处理数百条政策，效率低且一致性差。</p>
+  </div>
+  <p>核心思路：<strong>能否用爬虫自动采集 + LLM 自动研判，将人工筛选工作从"天"压缩到"分钟"？</strong></p>
+</section>
+
+<!-- Solution -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">02</span><span class="sec-title">解决方案</span></div>
+  <p>设计并实现端到端的政策分析自动化流水线：</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
+      <div class="flow-body">
+        <div class="flow-label">Step 1 · 多源爬虫采集</div>
+        <div class="flow-desc">针对财政部、工信部、发改委、国家税务总局、国家金融监管总局等 12+ 政府网站，编写定制爬虫，自动抓取最新政策标题、发布日期、全文链接及正文内容。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
+      <div class="flow-body">
+        <div class="flow-label">Step 2 · LLM 关联性研判</div>
+        <div class="flow-desc">将每条政策全文输入 DeepSeek API，通过精心设计的提示词，让模型判断该政策与集团核心业务（船舶制造、海洋工程、高端装备等）的关联程度，输出"高 / 中 / 低"及分析理由。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
+      <div class="flow-body">
+        <div class="flow-label">Step 3 · 人工校核 & 提示词迭代</div>
+        <div class="flow-desc">团队对 AI 研判结果进行人工校核，标注误判案例。基于 badcase 分析，持续优化提示词，逐步提升筛选准确率。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div></div>
+      <div class="flow-body">
+        <div class="flow-label">Step 4 · 结构化指引生成</div>
+        <div class="flow-desc">对筛选后的高关联政策，自动生成结构化指引文档：包含政策摘要、影响分析、所需行动和截止日期，直接输出为团队可用的工作材料。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ttags">
+    <span class="tt">Python 爬虫</span>
+    <span class="tt">DeepSeek API</span>
+    <span class="tt">提示词工程</span>
+    <span class="tt">Requests</span>
+    <span class="tt">BeautifulSoup</span>
+    <span class="tt">正则表达式</span>
+    <span class="tt">结构化输出</span>
+    <span class="tt">自动化流水线</span>
+  </div>
+</section>
+
+<!-- Interactive Demo -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">03</span><span class="sec-title">交互演示</span></div>
+  <p>以下是工具核心流程的交互式模拟——选择数据源，启动采集，查看 AI 实时研判结果。</p>
+
+  <div class="demo-container">
+    <div class="demo-header">
+      <div class="demo-header-dot" style="background:#E45A5A"></div>
+      <div class="demo-header-dot" style="background:#E4A853"></div>
+      <div class="demo-header-dot" style="background:#2A9D8F"></div>
+      <div class="demo-header-title">PolicyRadar Console</div>
+    </div>
+    <div class="demo-body">
+      <!-- Source selector -->
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;font-weight:500;">选择采集源（点击切换）</div>
+      <div class="source-grid" id="sourceGrid">
+        <div class="source-chip active" data-source="mof"><span class="chip-dot"></span>财政部</div>
+        <div class="source-chip active" data-source="miit"><span class="chip-dot"></span>工信部</div>
+        <div class="source-chip active" data-source="ndrc"><span class="chip-dot"></span>发改委</div>
+        <div class="source-chip" data-source="tax"><span class="chip-dot"></span>税务总局</div>
+        <div class="source-chip" data-source="nfra"><span class="chip-dot"></span>金融监管总局</div>
+        <div class="source-chip" data-source="moc"><span class="chip-dot"></span>商务部</div>
+        <div class="source-chip" data-source="most"><span class="chip-dot"></span>科技部</div>
+        <div class="source-chip" data-source="mohrss"><span class="chip-dot"></span>人社部</div>
+        <div class="source-chip" data-source="samr"><span class="chip-dot"></span>市场监管总局</div>
+        <div class="source-chip" data-source="safe"><span class="chip-dot"></span>外汇管理局</div>
+        <div class="source-chip" data-source="csrc"><span class="chip-dot"></span>证监会</div>
+        <div class="source-chip" data-source="mca"><span class="chip-dot"></span>民政部</div>
+      </div>
+
+      <button class="crawl-btn" id="crawlBtn" onclick="startCrawl()">
+        <span class="spinner"></span>
+        <span class="btn-text">▶ 开始采集 & AI 研判</span>
+      </button>
+
+      <!-- Log panel -->
+      <div class="log-panel" id="logPanel"></div>
+
+      <!-- Results -->
+      <div class="policy-results" id="policyResults">
+        <div class="policy-results-title">
+          AI 研判结果
+          <span class="count" id="resultCount">0</span>
+        </div>
+        <div id="policyCards"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-item"><div class="stat-val" id="statHigh">0</div><div class="stat-lbl">高关联</div></div>
+        <div class="stat-item"><div class="stat-val" id="statMid">0</div><div class="stat-lbl">中关联</div></div>
+        <div class="stat-item"><div class="stat-val" id="statLow">0</div><div class="stat-lbl">低关联</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Results -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">04</span><span class="sec-title">关键成果</span></div>
+  <p><strong>效率提升：</strong>将政策筛选从人工数天缩短至自动化分钟级完成，每季度节省团队约 3-5 个工作日的重复劳动。</p>
+  <p><strong>准确率迭代：</strong>经过多轮人工校核与提示词优化，AI 关联性判断准确率从初版约 70% 提升至 ~90%，持续迭代中。</p>
+  <p><strong>落地应用：</strong>产出的结构化政策指引已融入团队季度工作流程，成为业务决策的常规参考材料。</p>
+</section>
+
+<!-- Reflection -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">05</span><span class="sec-title">思考与反思</span></div>
+  <p>这个项目的核心挑战不在技术实现，而在于<strong>"如何让 AI 理解业务语境"</strong>。同一条政策，对船舶制造企业和互联网公司的意义完全不同——这需要在提示词中精确编码领域知识。</p>
+  <p>最有价值的经验是<strong>建立了"AI 输出 → 人工校核 → 提示词优化"的闭环</strong>。初版提示词的表现并不理想，但通过系统性地分析 badcase（例如将"碳足迹核算"误判为低关联），逐步将业务边界和判断标准写入提示词，实现了持续提升。</p>
+</section>
+
+<footer class="foot">
+  <a href="../index.html">← 返回作品集首页</a>
+</footer>
+
+</div>
+
+<script>
+// Source chip toggle
+document.querySelectorAll('.source-chip').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('active'));
+});
+
+// Policy data (based on real data)
+const policies = [
+  {
+    title: "关于进一步贯彻落实新保险合同会计准则的通知",
+    source: "财政部", date: "2025-04-14",
+    rel: "mid", relLabel: "中关联",
+    analysis: "该政策涉及保险合同会计准则调整。集团下属金融板块可能受影响，需关注对船舶保险、工程保险等业务的会计处理变化。与核心制造业务非直接相关，但对财务报表编制有间接影响。"
+  },
+  {
+    title: "关于公司法、外商投资法施行后有关财务处理问题的通知",
+    source: "财政部", date: "2025-03-21",
+    rel: "mid", relLabel: "中关联",
+    analysis: "明确了公司法修订后的财务处理要求。集团作为央企需遵守相关规定，涉及出资方式、减资程序等财务处理变更。建议财务部门重点关注实缴出资相关条款。"
+  },
+  {
+    title: "关于深入推进综合改革试点创新扩大开放的意见",
+    source: "国务院", date: "2025-04-02",
+    rel: "high", relLabel: "高关联",
+    analysis: "国务院推进综合改革试点，涉及高端装备制造、海洋经济等领域的开放创新政策。与集团船舶出口、海外工程承接、技术引进等核心业务高度相关。建议战略部门深入研读，把握政策窗口期。"
+  },
+  {
+    title: "关于同意授权海南省人民政府审批有关用地事项的批复",
+    source: "国务院", date: "2025-04-10",
+    rel: "low", relLabel: "低关联",
+    analysis: "该政策仅涉及海南省自贸港用地审批权限下放，属于区域性土地管理政策。与集团船舶制造、海洋工程主业无直接关联，除非集团在海南有重大基建项目规划。"
+  },
+  {
+    title: "关于推动工业机器人行业规范发展的通知",
+    source: "工信部", date: "2025-05-09",
+    rel: "high", relLabel: "高关联",
+    analysis: "工信部推动工业机器人行业规范化，涉及生产准入和应用标准。集团智能船厂、自动化焊接产线等场景大量使用工业机器人，需关注准入条件变化对供应链的影响，同时可申报相关补贴。"
+  },
+  {
+    title: "关于促进中小企业高校毕业生就业的工作方案",
+    source: "工信部 / 人社部", date: "2025-05-28",
+    rel: "low", relLabel: "低关联",
+    analysis: "聚焦中小企业高校毕业生就业促进，包括专场招聘、岗位对接等。集团属于大型央企，非中小企业范畴，该政策对集团招聘工作无直接适用性。"
+  },
+  {
+    title: "关于产品碳足迹核算标准体系建设的指导意见",
+    source: "发改委", date: "2025-06-06",
+    rel: "high", relLabel: "高关联",
+    analysis: "建立产品碳足迹核算标准体系，涉及制造业全链条碳排放核算。船舶制造属于高耗能行业，该政策将直接影响集团产品的碳标识和国际贸易合规性。建议尽早对标核算标准，为绿色船舶认证做准备。"
+  },
+  {
+    title: "关于加强医疗服务综合监管的指导意见",
+    source: "国务院", date: "2025-06-16",
+    rel: "low", relLabel: "低关联",
+    analysis: "聚焦医疗服务监管，涉及处方管理、耗材采购、医疗美容等领域。与集团船舶制造、海洋工程或高端装备制造等主营业务无任何关联。"
+  },
+  {
+    title: "关于支持网络游戏与图形处理器基础产品联合适配的通知",
+    source: "工信部", date: "2025-06-20",
+    rel: "low", relLabel: "低关联",
+    analysis: "政策聚焦网络游戏产业与GPU产品适配，属于数字文化娱乐领域。与集团重工业、海洋装备等业务领域无实质性关联。"
+  },
+  {
+    title: "关于推进水灾害防治与水资源保护的实施方案",
+    source: "发改委", date: "2025-06-25",
+    rel: "mid", relLabel: "中关联",
+    analysis: "涉及长江经济带、黄河流域水治理和现代化水网建设。集团海洋工程板块在水利基础设施、疏浚工程等领域有业务布局，可关注相关工程项目招标机会。"
+  }
+];
+
+// Crawl simulation
+let crawling = false;
+
+function getActiveSources() {
+  return [...document.querySelectorAll('.source-chip.active')].map(c => c.textContent.trim());
+}
+
+async function startCrawl() {
+  if (crawling) return;
+  crawling = true;
+
+  const btn = document.getElementById('crawlBtn');
+  const log = document.getElementById('logPanel');
+  const results = document.getElementById('policyResults');
+  const cards = document.getElementById('policyCards');
+  const stats = document.getElementById('statsBar');
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+  btn.querySelector('.btn-text').textContent = '采集中...';
+  log.innerHTML = '';
+  log.classList.add('visible');
+  results.classList.remove('visible');
+  stats.classList.remove('visible');
+  cards.innerHTML = '';
+
+  const sources = getActiveSources();
+  if (sources.length === 0) {
+    addLog('⚠ 请至少选择一个数据源', 'warn');
+    resetBtn();
+    return;
+  }
+
+  // Phase 1: Crawling logs
+  addLog('🚀 PolicyRadar v2.1 启动', 'ok');
+  await wait(400);
+
+  for (let i = 0; i < sources.length; i++) {
+    const s = sources[i];
+    addLog(`📡 正在连接 ${s} 官网...`, '');
+    await wait(300 + Math.random() * 400);
+    const count = Math.floor(8 + Math.random() * 25);
+    addLog(`✓ ${s}：成功抓取 ${count} 条政策`, 'ok');
+    await wait(200);
+  }
+
+  addLog(`── 采集完成，共获取政策条目，开始 AI 研判 ──`, '');
+  await wait(600);
+
+  // Phase 2: AI analysis
+  addLog('🤖 正在调用 DeepSeek API...', '');
+  await wait(500);
+  addLog('📋 加载集团业务画像：船舶制造 / 海洋工程 / 高端装备', '');
+  await wait(400);
+
+  const filteredPolicies = policies.filter(p => {
+    const sourceMap = { '财政部': 'mof', '工信部': 'miit', '发改委': 'ndrc', '国务院': 'ndrc',
+      '税务总局': 'tax', '金融监管总局': 'nfra', '商务部': 'moc', '科技部': 'most',
+      '人社部': 'mohrss', '工信部 / 人社部': 'miit' };
+    const srcKey = sourceMap[p.source] || '';
+    return sources.some(s => {
+      const chipMap = { '财政部':'mof','工信部':'miit','发改委':'ndrc','税务总局':'tax',
+        '金融监管总局':'nfra','商务部':'moc','科技部':'most','人社部':'mohrss',
+        '市场监管总局':'samr','外汇管理局':'safe','证监会':'csrc','民政部':'mca'};
+      return chipMap[s] === srcKey || p.source.includes(s) || s === '发改委' && p.source === '国务院';
+    });
+  });
+
+  let highCount = 0, midCount = 0, lowCount = 0;
+
+  results.classList.add('visible');
+
+  for (let i = 0; i < filteredPolicies.length; i++) {
+    const p = filteredPolicies[i];
+    addLog(`🔍 研判中：${p.title.substring(0, 30)}...`, '');
+    await wait(500 + Math.random() * 600);
+
+    const relText = p.rel === 'high' ? '高关联 ✓' : p.rel === 'mid' ? '中关联 ~' : '低关联 ✗';
+    const relClass = p.rel === 'high' ? 'ok' : p.rel === 'mid' ? 'warn' : '';
+    addLog(`  → ${relText}`, relClass);
+
+    if (p.rel === 'high') highCount++;
+    else if (p.rel === 'mid') midCount++;
+    else lowCount++;
+
+    // Add card
+    const card = document.createElement('div');
+    card.className = 'policy-card';
+    card.style.animationDelay = `${i * 0.05}s`;
+    card.innerHTML = `
+      <div class="policy-card-head">
+        <div class="policy-card-title">${p.title}</div>
+        <div class="rel-badge rel-${p.rel}">${p.relLabel}</div>
+      </div>
+      <div class="policy-card-meta">${p.source} · ${p.date}</div>
+      <div class="policy-card-analysis">
+        <div class="ai-label">DeepSeek 分析</div>
+        ${p.analysis}
+      </div>
+    `;
+    cards.appendChild(card);
+    document.getElementById('resultCount').textContent = i + 1;
+
+    await wait(200);
+  }
+
+  // Show stats
+  addLog(`\n✅ 研判完成：高关联 ${highCount} / 中关联 ${midCount} / 低关联 ${lowCount}`, 'ok');
+
+  document.getElementById('statHigh').textContent = highCount;
+  document.getElementById('statMid').textContent = midCount;
+  document.getElementById('statLow').textContent = lowCount;
+  stats.classList.add('visible');
+
+  resetBtn();
+}
+
+function addLog(text, cls) {
+  const log = document.getElementById('logPanel');
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  const time = new Date().toLocaleTimeString('en-GB');
+  line.innerHTML = `<span class="time">[${time}]</span> <span class="${cls || ''}">${text}</span>`;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+function resetBtn() {
+  const btn = document.getElementById('crawlBtn');
+  btn.classList.remove('loading');
+  btn.disabled = false;
+  btn.querySelector('.btn-text').textContent = '▶ 重新采集';
+  crawling = false;
+}
+
+function wait(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+</script>
+</body>
+</html>
