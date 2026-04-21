@@ -36,12 +36,10 @@
 
   .wrap { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:0 48px; }
 
-  /* Nav */
   .nav { padding:32px 0; display:flex; align-items:center; gap:8px; }
   .nav a { font-size:13px; color:var(--text-muted); transition:color .3s; }
   .nav a:hover { color:var(--accent); opacity:1; }
 
-  /* Hero */
   .hero { padding:20px 0 48px; }
   .hero-type { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); font-weight:500; margin-bottom:12px; }
   .hero h1 { font-family:'DM Serif Display',serif; font-size:40px; font-weight:400; line-height:1.2; margin-bottom:16px; }
@@ -50,7 +48,6 @@
   .hm { font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
   .hm-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); opacity:.5; }
 
-  /* Metrics banner */
   .metrics-bar {
     display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
     background:var(--card-bg); border:1px solid var(--border);
@@ -60,7 +57,6 @@
   .mb-val { font-family:'DM Serif Display',serif; font-size:28px; font-weight:700; color:var(--accent); }
   .mb-lbl { font-size:12px; color:var(--text-muted); margin-top:4px; }
 
-  /* Section */
   .sec { margin-bottom:52px; }
   .sec-h { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
   .sec-num { font-family:'DM Serif Display',serif; font-size:24px; color:var(--accent); opacity:.3; }
@@ -68,7 +64,6 @@
   .sec p { font-size:14.5px; color:var(--text-secondary); line-height:1.9; font-weight:300; margin-bottom:16px; }
   .sec p strong { color:var(--text-primary); font-weight:600; }
 
-  /* Highlight box */
   .hbox {
     background:var(--card-bg); border:1px solid var(--border);
     border-radius:14px; padding:24px 28px; margin:20px 0;
@@ -76,7 +71,6 @@
   .hbox-title { font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent); }
   .hbox p { margin-bottom:0; }
 
-  /* Step flow */
   .flow { display:flex; flex-direction:column; gap:0; margin:24px 0; }
   .flow-step { display:flex; gap:20px; position:relative; }
   .flow-line { display:flex; flex-direction:column; align-items:center; width:32px; flex-shrink:0; }
@@ -87,11 +81,10 @@
   .flow-label { font-size:13px; font-weight:600; margin-bottom:4px; }
   .flow-desc { font-size:13px; color:var(--text-secondary); font-weight:300; line-height:1.7; }
 
-  /* Tech tags */
   .ttags { display:flex; gap:8px; flex-wrap:wrap; margin:16px 0; }
   .tt { font-size:12px; padding:5px 14px; border-radius:8px; border:1px solid var(--border); color:var(--text-secondary); background:var(--card-bg); }
 
-  /* === Interactive Demo === */
+  /* Demo */
   .demo-container {
     background: var(--card-bg);
     border: 1px solid var(--border);
@@ -108,13 +101,11 @@
   }
   .demo-header-dot { width:8px; height:8px; border-radius:50%; }
   .demo-header-title { font-size:13px; color:var(--text-muted); font-weight:500; }
-
   .demo-body { padding: 24px; }
 
-  /* Source selector */
   .source-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 8px;
     margin-bottom: 20px;
   }
@@ -143,8 +134,17 @@
     flex-shrink: 0;
   }
   .source-chip.active .chip-dot { background: var(--accent); }
+  .source-chip .chip-count {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  .source-chip.active .chip-count { background: rgba(212,102,58,0.08); border-color: rgba(212,102,58,0.2); }
 
-  /* Crawl animation */
   .crawl-btn {
     display: inline-flex; align-items: center; gap: 8px;
     padding: 10px 24px;
@@ -172,16 +172,15 @@
   .crawl-btn.loading .spinner { display: block; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Log stream */
   .log-panel {
     background: #1a1612;
     border-radius: 12px;
     padding: 16px 20px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 12px;
-    line-height: 1.8;
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+    font-size: 11.5px;
+    line-height: 1.9;
     color: #a8977e;
-    max-height: 200px;
+    max-height: 220px;
     overflow-y: auto;
     margin-bottom: 20px;
     display: none;
@@ -191,10 +190,9 @@
   .log-line .time { color: #5a5040; }
   .log-line .ok { color: var(--green); }
   .log-line .warn { color: var(--yellow); }
-  .log-line .url { color: #c4a87a; }
+  .log-line .err { color: var(--red); }
   @keyframes fadeIn { to { opacity: 1; } }
 
-  /* Policy cards */
   .policy-results { display: none; }
   .policy-results.visible { display: block; }
   .policy-results-title {
@@ -210,6 +208,19 @@
     border-radius: 6px;
     font-weight: 500;
   }
+
+  .filter-tabs {
+    display: flex; gap: 8px; margin-bottom: 16px;
+  }
+  .filter-tab {
+    font-size: 12px; padding: 5px 14px;
+    border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text-muted);
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'Noto Sans SC', sans-serif;
+  }
+  .filter-tab:hover { border-color: var(--accent); color: var(--text-secondary); }
+  .filter-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
   .policy-card {
     border: 1px solid var(--border);
@@ -233,11 +244,11 @@
     font-weight: 600;
     white-space: nowrap;
   }
-  .rel-high { background: rgba(42,157,143,0.12); color: var(--green); }
-  .rel-mid { background: rgba(228,168,83,0.15); color: #b8860b; }
-  .rel-low { background: rgba(196,69,54,0.1); color: var(--red); }
+  .rel-in { background: rgba(42,157,143,0.12); color: var(--green); }
+  .rel-out { background: rgba(196,69,54,0.1); color: var(--red); }
 
-  .policy-card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .policy-card-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .meta-tag { padding: 2px 8px; border-radius: 4px; background: rgba(42,157,143,0.08); color: var(--green); font-size: 11px; font-weight:500; }
   .policy-card-analysis {
     font-size: 12.5px;
     color: var(--text-secondary);
@@ -247,9 +258,6 @@
     border-radius: 8px;
     border-left: 3px solid var(--accent);
   }
-  .policy-card-analysis strong { color: var(--text-primary); font-weight:500; }
-
-  /* AI analysis typing */
   .ai-label {
     font-size: 11px;
     color: var(--accent);
@@ -259,7 +267,6 @@
     margin-bottom: 6px;
   }
 
-  /* Stats bar */
   .stats-bar {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -278,7 +285,6 @@
   .stat-val { font-family:'DM Serif Display',serif; font-size: 24px; color: var(--accent); }
   .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
-  /* Footer */
   .foot { padding:48px 0 56px; text-align:center; border-top:1px solid var(--border); margin-top:20px; }
   .foot a { font-size:14px; color:var(--accent); font-weight:500; display:inline-flex; align-items:center; gap:6px; }
 
@@ -295,16 +301,14 @@
 <div class="ambient"><div class="amb"></div><div class="amb"></div><div class="amb"></div></div>
 <div class="wrap">
 
-<!-- Breadcrumb -->
 <nav class="nav">
   <a href="../index.html">← 返回作品集</a>
 </nav>
 
-<!-- Hero -->
 <header class="hero">
   <div class="hero-type">AI 辅助政策分析工具</div>
   <h1>PolicyRadar</h1>
-  <p class="hero-sub">通过爬虫采集十余个政府网站政策数据，接入 DeepSeek API 逐条判断与集团业务的相关性，自动生成结构化指引——已融入团队季度工作流程。</p>
+  <p class="hero-sub">通过爬虫采集十余个政府网站政策数据，接入 DeepSeek API 逐条判断与集团业务的相关性，并根据人工校核结果迭代优化提示词；对筛选后的政策自动生成结构化指引，已融入团队季度工作流程。</p>
   <div class="hero-meta">
     <div class="hm"><span class="hm-dot"></span>2025</div>
     <div class="hm"><span class="hm-dot"></span>独立负责</div>
@@ -312,30 +316,29 @@
   </div>
 </header>
 
-<!-- Metrics -->
 <div class="metrics-bar">
-  <div class="mb-item"><div class="mb-val">12+</div><div class="mb-lbl">政府网站数据源</div></div>
-  <div class="mb-item"><div class="mb-val">300+</div><div class="mb-lbl">政策条目采集</div></div>
-  <div class="mb-item"><div class="mb-val">~90%</div><div class="mb-lbl">AI 筛选准确率</div></div>
-  <div class="mb-item"><div class="mb-val">季度</div><div class="mb-lbl">融入团队工作流</div></div>
+  <div class="mb-item"><div class="mb-val">10</div><div class="mb-lbl">政府网站数据源</div></div>
+  <div class="mb-item"><div class="mb-val">176</div><div class="mb-lbl">政策条目采集</div></div>
+  <div class="mb-item"><div class="mb-val">38</div><div class="mb-lbl">AI 建议纳入</div></div>
+  <div class="mb-item"><div class="mb-val">26</div><div class="mb-lbl">实际纳入条目</div></div>
 </div>
 
-<!-- Problem -->
+<!-- 01 -->
 <section class="sec">
   <div class="sec-h"><span class="sec-num">01</span><span class="sec-title">问题发现</span></div>
   <p>大型集团企业需要持续跟踪国家及地方政策动态，以便及时把握财政补贴、税收优惠和产业扶持等机遇。但现有方式存在明显痛点：</p>
   <div class="hbox">
     <div class="hbox-title">痛点一 · 信息来源分散</div>
-    <p>财政部、工信部、发改委、国家税务总局等十余个政府网站各自发布政策，人工逐一浏览耗时巨大。</p>
+    <p>财政部、工信部、国务院、国家税务总局、国家金融监管总局等十个政府网站各自发布政策，人工逐一浏览耗时巨大。</p>
   </div>
   <div class="hbox">
     <div class="hbox-title">痛点二 · 关联判断主观低效</div>
-    <p>每条政策是否与集团业务相关，需要阅读全文后综合判断。人工处理数百条政策，效率低且一致性差。</p>
+    <p>每条政策是否与集团业务（船舶制造、海洋工程、高端装备）相关，需要阅读全文后综合判断。本批 176 条政策中仅 38 条有纳入价值，人工筛选效率极低且一致性差。</p>
   </div>
   <p>核心思路：<strong>能否用爬虫自动采集 + LLM 自动研判，将人工筛选工作从"天"压缩到"分钟"？</strong></p>
 </section>
 
-<!-- Solution -->
+<!-- 02 -->
 <section class="sec">
   <div class="sec-h"><span class="sec-num">02</span><span class="sec-title">解决方案</span></div>
   <p>设计并实现端到端的政策分析自动化流水线：</p>
@@ -345,21 +348,21 @@
       <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
       <div class="flow-body">
         <div class="flow-label">Step 1 · 多源爬虫采集</div>
-        <div class="flow-desc">针对财政部、工信部、发改委、国家税务总局、国家金融监管总局等 12+ 政府网站，编写定制爬虫，自动抓取最新政策标题、发布日期、全文链接及正文内容。</div>
+        <div class="flow-desc">针对工信部（61条）、国务院（36条）、国家金融监管总局（24条）、国家税务总局（20条）、财政部（17条）、人民银行（14条）等 10 个政府网站，编写定制爬虫，自动抓取最新政策标题、发布日期、全文链接及正文内容。</div>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
       <div class="flow-body">
         <div class="flow-label">Step 2 · LLM 关联性研判</div>
-        <div class="flow-desc">将每条政策全文输入 DeepSeek API，通过精心设计的提示词，让模型判断该政策与集团核心业务（船舶制造、海洋工程、高端装备等）的关联程度，输出"高 / 中 / 低"及分析理由。</div>
+        <div class="flow-desc">将每条政策全文输入 DeepSeek API，通过精心设计的提示词，让模型判断该政策与集团核心业务（船舶制造、海洋工程、高端装备等）的关联程度，输出"建议纳入 / 不建议纳入"及关联度分析理由。</div>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
       <div class="flow-body">
         <div class="flow-label">Step 3 · 人工校核 & 提示词迭代</div>
-        <div class="flow-desc">团队对 AI 研判结果进行人工校核，标注误判案例。基于 badcase 分析，持续优化提示词，逐步提升筛选准确率。</div>
+        <div class="flow-desc">团队对 AI 研判结果进行人工校核，标注"实际纳入与否"。基于 badcase 分析（如将碳足迹核算、安全生产责任险等误判），持续优化提示词模板和业务边界定义。</div>
       </div>
     </div>
     <div class="flow-step">
@@ -383,34 +386,31 @@
   </div>
 </section>
 
-<!-- Interactive Demo -->
+<!-- 03 -->
 <section class="sec">
   <div class="sec-h"><span class="sec-num">03</span><span class="sec-title">交互演示</span></div>
-  <p>以下是工具核心流程的交互式模拟——选择数据源，启动采集，查看 AI 实时研判结果。</p>
+  <p>以下是工具核心流程的交互式模拟——选择数据源，启动采集，查看 AI 实时研判结果。<strong>所有政策标题、来源、日期及 AI 分析均来自真实采集数据。</strong></p>
 
   <div class="demo-container">
     <div class="demo-header">
       <div class="demo-header-dot" style="background:#E45A5A"></div>
       <div class="demo-header-dot" style="background:#E4A853"></div>
       <div class="demo-header-dot" style="background:#2A9D8F"></div>
-      <div class="demo-header-title">PolicyRadar Console</div>
+      <div class="demo-header-title">PolicyRadar Console v2.1</div>
     </div>
     <div class="demo-body">
-      <!-- Source selector -->
       <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;font-weight:500;">选择采集源（点击切换）</div>
       <div class="source-grid" id="sourceGrid">
-        <div class="source-chip active" data-source="mof"><span class="chip-dot"></span>财政部</div>
-        <div class="source-chip active" data-source="miit"><span class="chip-dot"></span>工信部</div>
-        <div class="source-chip active" data-source="ndrc"><span class="chip-dot"></span>发改委</div>
-        <div class="source-chip" data-source="tax"><span class="chip-dot"></span>税务总局</div>
-        <div class="source-chip" data-source="nfra"><span class="chip-dot"></span>金融监管总局</div>
-        <div class="source-chip" data-source="moc"><span class="chip-dot"></span>商务部</div>
-        <div class="source-chip" data-source="most"><span class="chip-dot"></span>科技部</div>
-        <div class="source-chip" data-source="mohrss"><span class="chip-dot"></span>人社部</div>
-        <div class="source-chip" data-source="samr"><span class="chip-dot"></span>市场监管总局</div>
-        <div class="source-chip" data-source="safe"><span class="chip-dot"></span>外汇管理局</div>
-        <div class="source-chip" data-source="csrc"><span class="chip-dot"></span>证监会</div>
-        <div class="source-chip" data-source="mca"><span class="chip-dot"></span>民政部</div>
+        <div class="source-chip active" data-source="工信部"><span class="chip-dot"></span>工信部<span class="chip-count">61</span></div>
+        <div class="source-chip active" data-source="国务院"><span class="chip-dot"></span>国务院<span class="chip-count">36</span></div>
+        <div class="source-chip active" data-source="国家金融监管总局"><span class="chip-dot"></span>金融监管总局<span class="chip-count">24</span></div>
+        <div class="source-chip active" data-source="国家税务总局"><span class="chip-dot"></span>税务总局<span class="chip-count">20</span></div>
+        <div class="source-chip" data-source="财政部"><span class="chip-dot"></span>财政部<span class="chip-count">17</span></div>
+        <div class="source-chip" data-source="人民银行"><span class="chip-dot"></span>人民银行<span class="chip-count">14</span></div>
+        <div class="source-chip" data-source="科技部"><span class="chip-dot"></span>科技部<span class="chip-count">1</span></div>
+        <div class="source-chip" data-source="国资委"><span class="chip-dot"></span>国资委<span class="chip-count">1</span></div>
+        <div class="source-chip" data-source="国家外汇管理局"><span class="chip-dot"></span>外汇管理局<span class="chip-count">1</span></div>
+        <div class="source-chip" data-source="人力资源社会保障部"><span class="chip-dot"></span>人社部<span class="chip-count">1</span></div>
       </div>
 
       <button class="crawl-btn" id="crawlBtn" onclick="startCrawl()">
@@ -418,41 +418,43 @@
         <span class="btn-text">▶ 开始采集 & AI 研判</span>
       </button>
 
-      <!-- Log panel -->
       <div class="log-panel" id="logPanel"></div>
 
-      <!-- Results -->
       <div class="policy-results" id="policyResults">
         <div class="policy-results-title">
-          AI 研判结果
+          DeepSeek 研判结果
           <span class="count" id="resultCount">0</span>
+        </div>
+        <div class="filter-tabs" id="filterTabs">
+          <div class="filter-tab active" data-filter="all" onclick="filterCards('all',this)">全部</div>
+          <div class="filter-tab" data-filter="in" onclick="filterCards('in',this)">建议纳入</div>
+          <div class="filter-tab" data-filter="out" onclick="filterCards('out',this)">不建议纳入</div>
         </div>
         <div id="policyCards"></div>
       </div>
 
-      <!-- Stats -->
       <div class="stats-bar" id="statsBar">
-        <div class="stat-item"><div class="stat-val" id="statHigh">0</div><div class="stat-lbl">高关联</div></div>
-        <div class="stat-item"><div class="stat-val" id="statMid">0</div><div class="stat-lbl">中关联</div></div>
-        <div class="stat-item"><div class="stat-val" id="statLow">0</div><div class="stat-lbl">低关联</div></div>
+        <div class="stat-item"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">采集政策总数</div></div>
+        <div class="stat-item"><div class="stat-val" style="color:var(--green)" id="statIn">0</div><div class="stat-lbl">建议纳入</div></div>
+        <div class="stat-item"><div class="stat-val" style="color:var(--red)" id="statOut">0</div><div class="stat-lbl">不建议纳入</div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Results -->
+<!-- 04 -->
 <section class="sec">
   <div class="sec-h"><span class="sec-num">04</span><span class="sec-title">关键成果</span></div>
-  <p><strong>效率提升：</strong>将政策筛选从人工数天缩短至自动化分钟级完成，每季度节省团队约 3-5 个工作日的重复劳动。</p>
-  <p><strong>准确率迭代：</strong>经过多轮人工校核与提示词优化，AI 关联性判断准确率从初版约 70% 提升至 ~90%，持续迭代中。</p>
+  <p><strong>效率提升：</strong>176 条政策的采集与初筛从人工数天缩短至自动化分钟级完成，每季度节省团队约 3-5 个工作日的重复劳动。</p>
+  <p><strong>筛选质量：</strong>AI 从 176 条政策中建议纳入 38 条，经人工校核最终确认纳入 26 条。通过持续的 badcase 分析与提示词迭代，AI 研判与人工判断的一致性稳步提升。</p>
   <p><strong>落地应用：</strong>产出的结构化政策指引已融入团队季度工作流程，成为业务决策的常规参考材料。</p>
 </section>
 
-<!-- Reflection -->
+<!-- 05 -->
 <section class="sec">
   <div class="sec-h"><span class="sec-num">05</span><span class="sec-title">思考与反思</span></div>
   <p>这个项目的核心挑战不在技术实现，而在于<strong>"如何让 AI 理解业务语境"</strong>。同一条政策，对船舶制造企业和互联网公司的意义完全不同——这需要在提示词中精确编码领域知识。</p>
-  <p>最有价值的经验是<strong>建立了"AI 输出 → 人工校核 → 提示词优化"的闭环</strong>。初版提示词的表现并不理想，但通过系统性地分析 badcase（例如将"碳足迹核算"误判为低关联），逐步将业务边界和判断标准写入提示词，实现了持续提升。</p>
+  <p>最有价值的经验是<strong>建立了"AI 输出 → 人工校核 → 提示词优化"的闭环</strong>。初版提示词的表现并不理想，但通过系统性地分析 badcase（例如将"碳足迹核算"误判为不相关，或将"安全生产责任保险"的行业适用性判断偏差），逐步将业务边界和判断标准写入提示词，实现了持续提升。</p>
 </section>
 
 <footer class="foot">
@@ -462,80 +464,70 @@
 </div>
 
 <script>
-// Source chip toggle
 document.querySelectorAll('.source-chip').forEach(chip => {
   chip.addEventListener('click', () => chip.classList.toggle('active'));
 });
 
-// Policy data (based on real data)
+// All policy data from real CSV
 const policies = [
-  {
-    title: "关于进一步贯彻落实新保险合同会计准则的通知",
-    source: "财政部", date: "2025-04-14",
-    rel: "mid", relLabel: "中关联",
-    analysis: "该政策涉及保险合同会计准则调整。集团下属金融板块可能受影响，需关注对船舶保险、工程保险等业务的会计处理变化。与核心制造业务非直接相关，但对财务报表编制有间接影响。"
-  },
-  {
-    title: "关于公司法、外商投资法施行后有关财务处理问题的通知",
-    source: "财政部", date: "2025-03-21",
-    rel: "mid", relLabel: "中关联",
-    analysis: "明确了公司法修订后的财务处理要求。集团作为央企需遵守相关规定，涉及出资方式、减资程序等财务处理变更。建议财务部门重点关注实缴出资相关条款。"
-  },
-  {
-    title: "关于深入推进综合改革试点创新扩大开放的意见",
-    source: "国务院", date: "2025-04-02",
-    rel: "high", relLabel: "高关联",
-    analysis: "国务院推进综合改革试点，涉及高端装备制造、海洋经济等领域的开放创新政策。与集团船舶出口、海外工程承接、技术引进等核心业务高度相关。建议战略部门深入研读，把握政策窗口期。"
-  },
-  {
-    title: "关于同意授权海南省人民政府审批有关用地事项的批复",
-    source: "国务院", date: "2025-04-10",
-    rel: "low", relLabel: "低关联",
-    analysis: "该政策仅涉及海南省自贸港用地审批权限下放，属于区域性土地管理政策。与集团船舶制造、海洋工程主业无直接关联，除非集团在海南有重大基建项目规划。"
-  },
-  {
-    title: "关于推动工业机器人行业规范发展的通知",
-    source: "工信部", date: "2025-05-09",
-    rel: "high", relLabel: "高关联",
-    analysis: "工信部推动工业机器人行业规范化，涉及生产准入和应用标准。集团智能船厂、自动化焊接产线等场景大量使用工业机器人，需关注准入条件变化对供应链的影响，同时可申报相关补贴。"
-  },
-  {
-    title: "关于促进中小企业高校毕业生就业的工作方案",
-    source: "工信部 / 人社部", date: "2025-05-28",
-    rel: "low", relLabel: "低关联",
-    analysis: "聚焦中小企业高校毕业生就业促进，包括专场招聘、岗位对接等。集团属于大型央企，非中小企业范畴，该政策对集团招聘工作无直接适用性。"
-  },
-  {
-    title: "关于产品碳足迹核算标准体系建设的指导意见",
-    source: "发改委", date: "2025-06-06",
-    rel: "high", relLabel: "高关联",
-    analysis: "建立产品碳足迹核算标准体系，涉及制造业全链条碳排放核算。船舶制造属于高耗能行业，该政策将直接影响集团产品的碳标识和国际贸易合规性。建议尽早对标核算标准，为绿色船舶认证做准备。"
-  },
-  {
-    title: "关于加强医疗服务综合监管的指导意见",
-    source: "国务院", date: "2025-06-16",
-    rel: "low", relLabel: "低关联",
-    analysis: "聚焦医疗服务监管，涉及处方管理、耗材采购、医疗美容等领域。与集团船舶制造、海洋工程或高端装备制造等主营业务无任何关联。"
-  },
-  {
-    title: "关于支持网络游戏与图形处理器基础产品联合适配的通知",
-    source: "工信部", date: "2025-06-20",
-    rel: "low", relLabel: "低关联",
-    analysis: "政策聚焦网络游戏产业与GPU产品适配，属于数字文化娱乐领域。与集团重工业、海洋装备等业务领域无实质性关联。"
-  },
-  {
-    title: "关于推进水灾害防治与水资源保护的实施方案",
-    source: "发改委", date: "2025-06-25",
-    rel: "mid", relLabel: "中关联",
-    analysis: "涉及长江经济带、黄河流域水治理和现代化水网建设。集团海洋工程板块在水利基础设施、疏浚工程等领域有业务布局，可关注相关工程项目招标机会。"
-  }
+  // ===== 建议纳入 (真实数据) =====
+  { title:"公司法、外商投资法施行后有关财务处理问题明确", source:"财政部", date:"2025-06-27", rec:"in", actual:true,
+    analysis:"结论：建议纳入。政策涉及公司财务处理、公积金使用及外商投资企业基金调整，对集团财税管理和公司治理有实质影响。政策明确涉及公司法及外商投资法的财务处理，与集团作为中央管理企业的公司治理、资本运作及跨境业务直接相关。" },
+  { title:"财政部等九部门联合印发《关于推广应用电子凭证会计数据标准的通知》", source:"财政部", date:"2025-05-19", rec:"in", actual:true,
+    analysis:"结论：建议纳入。该政策涉及数字化转型和绿色低碳发展，且对企业的财税、会计信息化有实质性影响。政策直接关联企业会计信息化改造和电子凭证处理，与集团财务管理和数字化转型需求高度契合，尤其涉及船舶制造等大型企业的会计系统适配要求。" },
+  { title:"工业和信息化部等四部门关于公布工业产品碳足迹核算规则团体标准推荐清单（第二批）的通告", source:"工信部", date:"2025-06-30", rec:"in", actual:true,
+    analysis:"结论：建议纳入。政策紧密围绕绿色低碳国家战略，且对集团绿色转型有实质性指导作用。该政策涉及工业产品碳足迹核算，与集团船舶及海洋工程装备制造的绿色低碳发展直接相关，有助于提升碳管理水平。" },
+  { title:"工业和信息化部办公厅印发《关于深入推进工业和信息化绿色低碳标准化工作的实施方案》的通知", source:"工信部", date:"2025-06-26", rec:"in", actual:true,
+    analysis:"结论：建议纳入。政策紧密围绕国家绿色低碳战略，与集团主业高端装备制造直接相关，且涉及标准化工作对企业经营有实质性影响。该政策与集团在船舶、海洋工程等领域的绿色低碳技术研发和装备制造密切相关。" },
+  { title:"六部门关于开展2025年度智能工厂梯度培育行动的通知", source:"工信部", date:"2025-06-20", rec:"in", actual:true,
+    analysis:"结论：建议纳入。政策紧密围绕数字化转型国家战略，与集团高端装备制造主业直接相关，并提供实质性财税与技术支持。智能工厂建设直接关联船舶与海洋工程装备制造的智能化升级需求，卓越级/领航级培育目标与集团科技创新方向高度契合。" },
+  { title:"国家税务总局关于修订《国际运输船舶增值税退税管理办法》的公告", source:"国家税务总局", date:"2025-04-21", rec:"in", actual:true,
+    analysis:"结论：建议纳入。政策直接涉及国际运输船舶的增值税退税管理，与集团船舶制造核心业务高度相关，对集团船舶交付和出口税务处理有实质性影响。" },
+  { title:"三部门关于2025年度享受增值税加计抵减政策的先进制造业企业名单制定工作有关事项的通知", source:"工信部", date:"2025-06-09", rec:"in", actual:true,
+    analysis:"结论：建议纳入。政策涉及先进制造业增值税加计抵减，与集团高端装备制造企业税务优惠直接相关。集团下属企业可能符合先进制造业认定条件，享受增值税加计抵减政策红利。" },
+  { title:"中共中央办公厅 国务院办公厅关于完善中国特色现代企业制度的意见", source:"国务院", date:"2025-05-26", rec:"in", actual:true,
+    analysis:"结论：建议纳入。政策涉及完善中国特色现代企业制度，作为央企集团的公司治理顶层设计具有直接指导意义，对集团法人治理结构、党委前置研究等制度建设有实质性影响。" },
+  { title:"重要军工设施保护条例", source:"国务院", date:"2025-05-26", rec:"in", actual:true,
+    analysis:"结论：建议纳入。集团作为重要军工央企，该条例直接关联军工设施保护的法律合规要求。涉及军工设施保护区划定、安全保卫等实质性要求，与集团军工业务合规运营密切相关。" },
+  { title:"中央企业发展规划管理办法", source:"国资委", date:"2025-06-06", rec:"in", actual:true,
+    analysis:"结论：建议纳入。国资委发布的央企发展规划管理办法，对集团战略规划编制、报批和实施全流程具有直接约束力，是集团经营管理的核心制度依据。" },
+  { title:"工业和信息化部办公厅关于印发《智能制造典型场景参考指引（2025年版）》的通知", source:"工信部", date:"2025-04-27", rec:"in", actual:true,
+    analysis:"结论：建议纳入。智能制造典型场景指引与集团船舶制造智能化转型直接相关，涉及智能焊接、数字化车间等核心生产场景，对集团智能制造规划有实质性参考价值。" },
+  { title:"应急管理部等七部门关于印发《安全生产责任保险实施办法》的通知", source:"国家金融监管总局", date:"2025-04-02", rec:"in", actual:true,
+    analysis:"结论：建议纳入。安全生产责任保险涉及高危行业企业强制投保要求，集团船舶制造涉及焊接、涂装等高危作业环节，该办法对集团安全生产管理和保险合规有直接影响。" },
+  { title:"人力资源社会保障部 财政部 税务总局关于延续实施失业保险稳岗惠民政策措施的通知", source:"国家税务总局", date:"2025-04-14", rec:"in", actual:true,
+    analysis:"结论：建议纳入。政策涉及失业保险稳岗返还和社保缴费优惠，直接影响集团人力资源成本和员工管理。延续实施稳岗惠民措施对集团下属企业的社保负担和人员稳定有实质性支持。" },
+  // ===== 不建议纳入 (真实数据) =====
+  { title:"财政部、金融监管总局印发通知进一步加强对企业实施新保险合同会计准则的指导", source:"财政部", date:"2025-06-12", rec:"out", actual:false,
+    analysis:"结论：不建议纳入。该政策主要针对保险行业会计准则实施，与船舶制造主业无直接关联。政策内容聚焦保险合同会计准则的调整与执行，未涉及船舶、海洋工程或高端装备制造领域，且未提及相关财税、金融支持等实质性影响条款。" },
+  { title:"《全国住房公积金2024年年度报告》印发", source:"财政部", date:"2025-06-05", rec:"out", actual:false,
+    analysis:"结论：不建议纳入。该政策主要涉及住房公积金管理，与集团主业及核心战略关联度不高。政策内容聚焦于住房公积金信息披露制度，未提及船舶制造、海洋工程或高端装备制造领域。" },
+  { title:"2025年第12届世界运动会税收政策明确", source:"财政部", date:"2025-05-30", rec:"out", actual:false,
+    analysis:"结论：不建议纳入。政策内容与集团主业及核心战略无直接关联。该税收政策主要针对世界运动会执委会及相关活动，未涉及船舶、海洋工程或高端装备制造领域。" },
+  { title:"工业和信息化部关于公布第四批国家工业遗产名单的通告", source:"工信部", date:"2025-06-30", rec:"out", actual:false,
+    analysis:"结论：不建议纳入。政策聚焦工业遗产认定与保护，属于文化遗产范畴。与集团船舶制造、海洋工程等核心业务无实质性经营关联，不涉及财税优惠或产业扶持。" },
+  { title:"工业和信息化部等三部门关于征集第六批工业产品绿色设计示范企业的通知", source:"工信部", date:"2025-06-24", rec:"out", actual:false,
+    analysis:"结论：不建议纳入。虽涉及绿色设计主题，但本批征集聚焦消费电子、纺织等行业，未包含船舶制造或重工业装备领域。集团暂不在本批征集范围内。" },
+  { title:"国家金融监督管理总局办公厅关于加强保险公司佣金管理工作的通知", source:"国家金融监管总局", date:"2025-06-25", rec:"out", actual:false,
+    analysis:"结论：不建议纳入。政策聚焦保险行业佣金管理规范，与集团船舶制造、海洋工程主业无直接关联。不涉及工业企业财税、金融支持等实质性影响条款。" },
+  { title:"国务院关于同意在海南省暂时调整实施有关行政法规规定的批复", source:"国务院", date:"2025-06-16", rec:"out", actual:false,
+    analysis:"结论：不建议纳入。政策仅涉及海南自贸港特定行政法规调整，属于区域性制度安排。与集团主业及核心战略方向无直接关联，除非集团在海南有重大业务布局。" },
 ];
 
-// Crawl simulation
 let crawling = false;
 
 function getActiveSources() {
-  return [...document.querySelectorAll('.source-chip.active')].map(c => c.textContent.trim());
+  return [...document.querySelectorAll('.source-chip.active')].map(c => c.dataset.source);
+}
+
+function filterCards(filter, el) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.policy-card').forEach(card => {
+    if (filter === 'all') card.style.display = '';
+    else if (filter === 'in') card.style.display = card.dataset.rec === 'in' ? '' : 'none';
+    else card.style.display = card.dataset.rec === 'out' ? '' : 'none';
+  });
 }
 
 async function startCrawl() {
@@ -560,89 +552,77 @@ async function startCrawl() {
   const sources = getActiveSources();
   if (sources.length === 0) {
     addLog('⚠ 请至少选择一个数据源', 'warn');
-    resetBtn();
-    return;
+    resetBtn(); return;
   }
 
-  // Phase 1: Crawling logs
+  const sourceCounts = {
+    '工信部':61, '国务院':36, '国家金融监管总局':24, '国家税务总局':20,
+    '财政部':17, '人民银行':14, '科技部':1, '国资委':1,
+    '国家外汇管理局':1, '人力资源社会保障部':1
+  };
+
   addLog('🚀 PolicyRadar v2.1 启动', 'ok');
   await wait(400);
+  addLog('📋 加载集团业务画像：船舶制造 / 海洋工程 / 高端装备', '');
+  await wait(300);
 
-  for (let i = 0; i < sources.length; i++) {
-    const s = sources[i];
+  let totalCrawled = 0;
+  for (const s of sources) {
+    const count = sourceCounts[s] || 1;
     addLog(`📡 正在连接 ${s} 官网...`, '');
-    await wait(300 + Math.random() * 400);
-    const count = Math.floor(8 + Math.random() * 25);
-    addLog(`✓ ${s}：成功抓取 ${count} 条政策`, 'ok');
-    await wait(200);
+    await wait(250 + Math.random() * 350);
+    addLog(`  ✓ ${s}：成功抓取 ${count} 条政策`, 'ok');
+    totalCrawled += count;
+    await wait(150);
   }
 
-  addLog(`── 采集完成，共获取政策条目，开始 AI 研判 ──`, '');
+  addLog(`── 采集完成，共 ${totalCrawled} 条，正在调用 DeepSeek API ──`, '');
   await wait(600);
-
-  // Phase 2: AI analysis
-  addLog('🤖 正在调用 DeepSeek API...', '');
-  await wait(500);
-  addLog('📋 加载集团业务画像：船舶制造 / 海洋工程 / 高端装备', '');
+  addLog('🤖 DeepSeek API 连接成功，开始逐条研判...', 'ok');
   await wait(400);
 
-  const filteredPolicies = policies.filter(p => {
-    const sourceMap = { '财政部': 'mof', '工信部': 'miit', '发改委': 'ndrc', '国务院': 'ndrc',
-      '税务总局': 'tax', '金融监管总局': 'nfra', '商务部': 'moc', '科技部': 'most',
-      '人社部': 'mohrss', '工信部 / 人社部': 'miit' };
-    const srcKey = sourceMap[p.source] || '';
-    return sources.some(s => {
-      const chipMap = { '财政部':'mof','工信部':'miit','发改委':'ndrc','税务总局':'tax',
-        '金融监管总局':'nfra','商务部':'moc','科技部':'most','人社部':'mohrss',
-        '市场监管总局':'samr','外汇管理局':'safe','证监会':'csrc','民政部':'mca'};
-      return chipMap[s] === srcKey || p.source.includes(s) || s === '发改委' && p.source === '国务院';
-    });
-  });
-
-  let highCount = 0, midCount = 0, lowCount = 0;
-
+  const filteredPolicies = policies.filter(p => sources.includes(p.source));
+  let inCount = 0, outCount = 0;
   results.classList.add('visible');
 
   for (let i = 0; i < filteredPolicies.length; i++) {
     const p = filteredPolicies[i];
-    addLog(`🔍 研判中：${p.title.substring(0, 30)}...`, '');
-    await wait(500 + Math.random() * 600);
+    addLog(`🔍 [${i+1}/${filteredPolicies.length}] ${p.title.substring(0, 35)}...`, '');
+    await wait(350 + Math.random() * 450);
 
-    const relText = p.rel === 'high' ? '高关联 ✓' : p.rel === 'mid' ? '中关联 ~' : '低关联 ✗';
-    const relClass = p.rel === 'high' ? 'ok' : p.rel === 'mid' ? 'warn' : '';
-    addLog(`  → ${relText}`, relClass);
+    if (p.rec === 'in') { addLog(`  → 建议纳入 ✓`, 'ok'); inCount++; }
+    else { addLog(`  → 不建议纳入 ✗`, 'err'); outCount++; }
 
-    if (p.rel === 'high') highCount++;
-    else if (p.rel === 'mid') midCount++;
-    else lowCount++;
-
-    // Add card
     const card = document.createElement('div');
     card.className = 'policy-card';
-    card.style.animationDelay = `${i * 0.05}s`;
+    card.dataset.rec = p.rec;
+    card.style.animationDelay = `${i * 0.03}s`;
+
+    const badgeClass = p.rec === 'in' ? 'rel-in' : 'rel-out';
+    const badgeText = p.rec === 'in' ? '建议纳入' : '不建议纳入';
+    const actualTag = p.actual ? '<span class="meta-tag">✓ 已实际纳入</span>' : '';
+
     card.innerHTML = `
       <div class="policy-card-head">
         <div class="policy-card-title">${p.title}</div>
-        <div class="rel-badge rel-${p.rel}">${p.relLabel}</div>
+        <div class="rel-badge ${badgeClass}">${badgeText}</div>
       </div>
-      <div class="policy-card-meta">${p.source} · ${p.date}</div>
+      <div class="policy-card-meta">${p.source} · ${p.date} ${actualTag}</div>
       <div class="policy-card-analysis">
-        <div class="ai-label">DeepSeek 分析</div>
+        <div class="ai-label">DeepSeek 关联度分析</div>
         ${p.analysis}
       </div>
     `;
     cards.appendChild(card);
     document.getElementById('resultCount').textContent = i + 1;
-
-    await wait(200);
+    await wait(120);
   }
 
-  // Show stats
-  addLog(`\n✅ 研判完成：高关联 ${highCount} / 中关联 ${midCount} / 低关联 ${lowCount}`, 'ok');
+  addLog(`\n✅ 研判完成：建议纳入 ${inCount} 条 / 不建议纳入 ${outCount} 条`, 'ok');
 
-  document.getElementById('statHigh').textContent = highCount;
-  document.getElementById('statMid').textContent = midCount;
-  document.getElementById('statLow').textContent = lowCount;
+  document.getElementById('statTotal').textContent = totalCrawled;
+  document.getElementById('statIn').textContent = inCount;
+  document.getElementById('statOut').textContent = outCount;
   stats.classList.add('visible');
 
   resetBtn();
@@ -666,9 +646,7 @@ function resetBtn() {
   crawling = false;
 }
 
-function wait(ms) {
-  return new Promise(r => setTimeout(r, ms));
-}
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
