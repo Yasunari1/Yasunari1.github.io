@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VirtualDiner · 赵宸昊</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FDF6EE;
+    --card-bg: #FFFFFF;
+    --text-primary: #2D2018;
+    --text-secondary: #7A6A5A;
+    --text-muted: #A8977E;
+    --accent: #D4663A;
+    --accent-glow: rgba(212, 102, 58, 0.10);
+    --accent2: #2A9D8F;
+    --accent3: #C44536;
+    --accent4: #E4A853;
+    --border: #E8DDD0;
+    --border-hover: #D4C4B0;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Noto Sans SC',sans-serif; background:var(--bg); color:var(--text-primary); line-height:1.8; -webkit-font-smoothing:antialiased; }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { opacity:.7; }
+
+  .ambient { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .amb { position:absolute; border-radius:50%; filter:blur(120px); opacity:.1; }
+  .amb:nth-child(1) { width:500px; height:500px; background:var(--accent); top:-150px; right:-80px; }
+  .amb:nth-child(2) { width:350px; height:350px; background:var(--accent4); bottom:10%; left:-60px; }
+
+  .wrap { position:relative; z-index:1; max-width:800px; margin:0 auto; padding:0 48px; }
+
+  /* Nav */
+  .nav { padding:32px 0; display:flex; align-items:center; gap:8px; }
+  .nav a { font-size:13px; color:var(--text-muted); transition:color .3s; }
+  .nav a:hover { color:var(--accent); opacity:1; }
+  .nav-sep { color:var(--border); font-size:12px; }
+  .nav-cur { font-size:13px; color:var(--text-secondary); }
+
+  /* Hero */
+  .hero { padding:20px 0 48px; }
+  .hero-type { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); font-weight:500; margin-bottom:12px; }
+  .hero h1 { font-family:'DM Serif Display',serif; font-size:40px; font-weight:400; line-height:1.2; margin-bottom:16px; }
+  .hero-sub { font-size:16px; color:var(--text-secondary); font-weight:300; line-height:1.9; max-width:640px; }
+  .hero-meta { display:flex; gap:24px; margin-top:20px; flex-wrap:wrap; }
+  .hm { font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:6px; }
+  .hm-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); opacity:.5; }
+
+  /* Metrics banner */
+  .metrics-bar {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:16px; padding:28px 32px; margin-bottom:56px;
+  }
+  .mb-item { text-align:center; }
+  .mb-val { font-family:'DM Serif Display',serif; font-size:28px; font-weight:700; color:var(--accent); }
+  .mb-lbl { font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+  /* Section */
+  .sec { margin-bottom:52px; }
+  .sec-h { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .sec-num { font-family:'DM Serif Display',serif; font-size:24px; color:var(--accent); opacity:.3; }
+  .sec-title { font-size:18px; font-weight:700; }
+
+  .sec p { font-size:14.5px; color:var(--text-secondary); line-height:1.9; font-weight:300; margin-bottom:16px; }
+  .sec p strong { color:var(--text-primary); font-weight:600; }
+
+  /* Highlight box */
+  .hbox {
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:14px; padding:24px 28px; margin:20px 0;
+  }
+  .hbox-title { font-size:13px; font-weight:600; margin-bottom:8px; color:var(--accent); }
+  .hbox p { margin-bottom:0; }
+
+  /* Architecture diagram placeholder */
+  .arch-diagram {
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:16px; overflow:hidden; margin:24px 0;
+  }
+  .arch-svg { width:100%; display:block; }
+
+  /* Step flow */
+  .flow { display:flex; flex-direction:column; gap:0; margin:24px 0; }
+  .flow-step { display:flex; gap:20px; position:relative; }
+  .flow-line { display:flex; flex-direction:column; align-items:center; width:32px; flex-shrink:0; }
+  .flow-dot { width:12px; height:12px; border-radius:50%; border:2px solid var(--accent); background:var(--bg); z-index:1; flex-shrink:0; }
+  .flow-dot.filled { background:var(--accent); }
+  .flow-track { width:2px; flex:1; background:var(--border); }
+  .flow-body { padding:0 0 32px; flex:1; }
+  .flow-body:last-child { padding-bottom:0; }
+  .flow-label { font-size:13px; font-weight:600; margin-bottom:4px; }
+  .flow-desc { font-size:13px; color:var(--text-secondary); font-weight:300; line-height:1.7; }
+
+  /* Tech tags */
+  .ttags { display:flex; gap:8px; flex-wrap:wrap; margin:16px 0; }
+  .tt { font-size:12px; padding:5px 14px; border-radius:8px; border:1px solid var(--border); color:var(--text-secondary); background:var(--card-bg); }
+
+  /* Dashboard placeholder */
+  .dash-frame {
+    background:var(--card-bg); border:1px solid var(--border);
+    border-radius:16px; overflow:hidden; margin:24px 0;
+  }
+  .dash-frame iframe {
+    width:100%; height:720px; border:none; display:block;
+  }
+  .dash-link {
+    display:block; text-align:center; padding:12px;
+    font-size:12px; color:var(--text-muted); border-top:1px solid var(--border);
+  }
+  .dash-link a { color:var(--accent); }
+
+  /* Footer */
+  .foot { padding:48px 0 56px; text-align:center; border-top:1px solid var(--border); margin-top:20px; }
+  .foot a { font-size:14px; color:var(--accent); font-weight:500; display:inline-flex; align-items:center; gap:6px; }
+
+  @media(max-width:640px) {
+    .wrap { padding:0 24px; }
+    .hero h1 { font-size:28px; }
+    .metrics-bar { grid-template-columns:1fr; gap:12px; padding:20px 24px; }
+    .mb-item { text-align:left; display:flex; align-items:center; gap:12px; }
+  }
+</style>
+</head>
+<body>
+<div class="ambient"><div class="amb"></div><div class="amb"></div></div>
+<div class="wrap">
+
+<!-- Breadcrumb -->
+<nav class="nav">
+  <a href="../index.html">← 返回作品集</a>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-type">LLM Agent 仿真系统</div>
+  <h1>VirtualDiner</h1>
+  <p class="hero-sub">面向外卖补贴策略优化的大语言模型用户行为仿真系统——用 AI Agent 替代线上 A/B 测试，实现低成本、可复现的离线策略评估。</p>
+  <div class="hero-meta">
+    <div class="hm"><span class="hm-dot"></span>2026.04</div>
+    <div class="hm"><span class="hm-dot"></span>核心成员</div>
+    <div class="hm"><span class="hm-dot"></span>产品设计 + 技术实现</div>
+  </div>
+</header>
+
+<!-- Metrics -->
+<div class="metrics-bar">
+  <div class="mb-item"><div class="mb-val">-14.2%</div><div class="mb-lbl">GTV 预测误差降低</div></div>
+  <div class="mb-item"><div class="mb-val">+10.6%</div><div class="mb-lbl">暴雨场景 GTV 提升</div></div>
+  <div class="mb-item"><div class="mb-val">4 类</div><div class="mb-lbl">典型用户 Agent</div></div>
+</div>
+
+<!-- Problem -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">01</span><span class="sec-title">问题发现</span></div>
+  <p>在外卖平台的补贴运营中，<strong>A/B 测试是验证策略有效性的标准手段</strong>，但存在两个核心痛点：</p>
+  <div class="hbox">
+    <div class="hbox-title">痛点一 · 成本高周期长</div>
+    <p>每次线上 A/B 测试都需要真实流量，涉及真金白银的补贴投入和至少一周的测试周期，迭代速度慢。</p>
+  </div>
+  <div class="hbox">
+    <div class="hbox-title">痛点二 · 长尾场景数据稀疏</div>
+    <p>暴雨、晚高峰、新商圈等特殊场景下用户数据量少，传统 A/B 测试统计功效不足，难以得出可靠结论。</p>
+  </div>
+  <p>核心思路：<strong>能否用 AI Agent 模拟用户行为，在离线环境中快速评估不同券策略的效果？</strong></p>
+</section>
+
+<!-- Solution -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">02</span><span class="sec-title">解决方案</span></div>
+  <p>构建基于大语言模型的用户行为仿真系统，核心流程如下：</p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
+      <div class="flow-body">
+        <div class="flow-label">Step 1 · 用户画像聚类</div>
+        <div class="flow-desc">基于 M 平台脱敏数据（499 条用户数据 + 1936 条行为链），提出基于编辑距离和向量距离的行为链距离度量方法，将用户聚类为 4 类典型画像。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
+      <div class="flow-body">
+        <div class="flow-label">Step 2 · Agent 行为建模</div>
+        <div class="flow-desc">为每类用户构建 LLM Agent，模拟从浏览、比价、领券到下单的完整决策链。Agent 能够根据不同的补贴策略做出差异化的行为响应。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot filled"></div><div class="flow-track"></div></div>
+      <div class="flow-body">
+        <div class="flow-label">Step 3 · MCTS 行为优化</div>
+        <div class="flow-desc">通过蒙特卡罗树搜索对 Agent 的仿真行为进行优化。以行为链距离作为奖励函数，基于 badcase 分析迭代提示词，使 Agent 行为更贴近真实用户。</div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div></div>
+      <div class="flow-body">
+        <div class="flow-label">Step 4 · 运营数据看板</div>
+        <div class="flow-desc">基于仿真系统构建面向运营人员的数据看板。输入券策略 → 输出仿真 GTV 预测 + 最优券策略建议 + Agent 决策日志（用户行为归因）。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ttags">
+    <span class="tt">LLM Agent</span>
+    <span class="tt">蒙特卡罗树搜索</span>
+    <span class="tt">编辑距离</span>
+    <span class="tt">向量距离</span>
+    <span class="tt">用户画像聚类</span>
+    <span class="tt">行为链建模</span>
+    <span class="tt">提示词优化</span>
+    <span class="tt">Python</span>
+  </div>
+</section>
+
+<!-- Results -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">03</span><span class="sec-title">关键成果</span></div>
+  <p><strong>预测精度：</strong>Agent 仿真得到的 GTV 相较多元线性回归传统模型，预测误差降低 14.2%，证明 LLM Agent 能更准确地模拟用户在不同券策略下的行为响应。</p>
+  <p><strong>策略优化：</strong>在暴雨晚高峰场景下进行策略验证，仿真系统提出的优化券策略相比随机基线提升 10.6% GTV，同步输出 Agent 决策日志供运营参考。</p>
+  <p><strong>产品价值：</strong>将策略验证从"线上烧钱测"变为"离线模拟评"，尤其在长尾场景下提供了传统 A/B 测试无法实现的低成本策略评估能力。</p>
+</section>
+
+<!-- Dashboard -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">04</span><span class="sec-title">数据看板</span></div>
+  <p>面向运营人员的交互式看板，支持输入券策略参数，实时输出仿真结果与优化建议。</p>
+  <div class="dash-frame">
+    <iframe src="dashboard.html" title="券策略仿真看板"></iframe>
+    <div class="dash-link">交互式看板 · 可选择场景、调整补贴力度，查看仿真结果 · <a href="dashboard.html" target="_blank">新窗口打开 ↗</a></div>
+  </div>
+</section>
+
+<!-- Reflection -->
+<section class="sec">
+  <div class="sec-h"><span class="sec-num">05</span><span class="sec-title">思考与反思</span></div>
+  <p>这个项目最有意思的地方在于<strong>用 AI 来模拟人的决策</strong>。传统的用户行为模型是统计模型，只能捕捉平均趋势；而 LLM Agent 能理解"为什么用户会做这个决策"，在长尾场景下表现更好。</p>
+  <p>挑战在于如何评价 Agent 行为的"真实度"——我们提出的行为链距离度量是一次尝试，但如何定义"好的模拟"仍然是一个开放问题。</p>
+</section>
+
+<footer class="foot">
+  <a href="../index.html">← 返回作品集首页</a>
+</footer>
+
+</div>
+</body>
+</html>

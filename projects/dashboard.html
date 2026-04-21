@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>券策略仿真看板</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; font-family: system-ui, -apple-system, sans-serif; background: #f0ece6; }
+  #root { height: 100%; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ccc4bb; }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input:focus { outline: 2px solid #c4622d; outline-offset: -1px; }
+  select:focus { outline: 2px solid #c4622d; outline-offset: -1px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const C = {
+  bg: '#f0ece6',
+  surface: '#faf8f5',
+  border: '#ddd6ce',
+  borderLight: '#e8e2dc',
+  brown: '#1e1510',
+  brownMid: '#3d2b1f',
+  muted: '#8a7d74',
+  mutedLight: '#b0a49c',
+  orange: '#c4622d',
+  orangeBg: '#f0e0d4',
+  orangeBgLight: '#f7ede6',
+  green: '#3a6b48',
+  greenBg: '#e0ede5',
+  red: '#9b3a2a',
+  redBg: '#f5e0dc',
+};
+
+// ─── Scene definitions ───
+// Each scene has: curve params, baseline params, and per-cluster coupon + GTV rate
+const SCENES = {
+  '暴雨晚高峰': {
+    // High demand driven by weather urgency; subsidies have moderate incremental effect.
+    // Users are less price-elastic — they order regardless, so GTV base is high
+    // but marginal lift from subsidies plateaus quickly.
+    curve:    { base: 33, maxLift: 22, decay: 0.50 },
+    baseline: { base: 29, maxLift: 18, decay: 0.35 },
+    clusters: [
+      { key: 'mainstream', name: '主流消费', coupon: '满70减15', gtvRate: 47.2 },
+      { key: 'habitual',   name: '习惯型',   coupon: '满60减10', gtvRate: 63.2 },
+      { key: 'sensitive',  name: '价格敏感', coupon: '满55减15', gtvRate: 46.4 },
+      { key: 'lowfreq',    name: '低频消费', coupon: '满25减5',  gtvRate: 59.2 },
+    ],
+  },
+  '晴天午高峰': {
+    // Good weather = high substitutability (dine-out, cook at home).
+    // Users are more price-elastic; coupons have strong lift but need lower thresholds.
+    // Base GTV is lower, but subsidies unlock bigger incremental orders.
+    curve:    { base: 25, maxLift: 30, decay: 0.68 },
+    baseline: { base: 22, maxLift: 24, decay: 0.48 },
+    clusters: [
+      { key: 'mainstream', name: '主流消费', coupon: '满50减10', gtvRate: 38.5 },
+      { key: 'habitual',   name: '习惯型',   coupon: '满45减8',  gtvRate: 52.0 },
+      { key: 'sensitive',  name: '价格敏感', coupon: '满30减10', gtvRate: 34.0 },
+      { key: 'lowfreq',    name: '低频消费', coupon: '满20减4',  gtvRate: 45.0 },
+    ],
+  },
+  '工作日早高峰': {
+    // Habit-driven commuter ordering; low price sensitivity, tight time window.
+    // Subsidies have low marginal effect — demand is inelastic. Coupons mainly
+    // reinforce habit rather than stimulate new orders. Curve is flat and slow.
+    curve:    { base: 28, maxLift: 16, decay: 0.38 },
+    baseline: { base: 25, maxLift: 14, decay: 0.30 },
+    clusters: [
+      { key: 'mainstream', name: '主流消费', coupon: '满60减8',  gtvRate: 41.0 },
+      { key: 'habitual',   name: '习惯型',   coupon: '满55减6',  gtvRate: 58.5 },
+      { key: 'sensitive',  name: '价格敏感', coupon: '满45减8',  gtvRate: 37.0 },
+      { key: 'lowfreq',    name: '低频消费', coupon: '满30减5',  gtvRate: 50.0 },
+    ],
+  },
+  '节假日高峰': {
+    // Holiday: high social dining, large basket sizes, diverse user intent.
+    // Subsidies unlock premium SKUs and group orders — very high lift potential.
+    // High base GTV, steep early gain, then plateaus at high ceiling.
+    curve:    { base: 36, maxLift: 32, decay: 0.72 },
+    baseline: { base: 30, maxLift: 25, decay: 0.50 },
+    clusters: [
+      { key: 'mainstream', name: '主流消费', coupon: '满100减20', gtvRate: 58.0 },
+      { key: 'habitual',   name: '习惯型',   coupon: '满80减15',  gtvRate: 74.0 },
+      { key: 'sensitive',  name: '价格敏感', coupon: '满60减18',  gtvRate: 52.0 },
+      { key: 'lowfreq',    name: '低频消费', coupon: '满40减8',   gtvRate: 66.0 },
+    ],
+  },
+};
+
+function getScene(sceneName) {
+  return SCENES[sceneName] || SCENES['暴雨晚高峰'];
+}
+
+function curveGTV(budgetWan, totalUsers, sceneName) {
+  const { curve } = getScene(sceneName);
+  const budgetPerUser = (budgetWan * 10000) / Math.max(totalUsers, 1);
+  const liftFactor = 1 - Math.exp(-curve.decay * budgetPerUser);
+  return (curve.base + curve.maxLift * liftFactor) * (totalUsers / 10000);
+}
+
+function baselineGTV(budgetWan, totalUsers, sceneName) {
+  const { baseline } = getScene(sceneName);
+  const budgetPerUser = (budgetWan * 10000) / Math.max(totalUsers, 1);
+  const liftFactor = 1 - Math.exp(-baseline.decay * budgetPerUser);
+  return (baseline.base + baseline.maxLift * liftFactor) * (totalUsers / 10000);
+}
+
+/* ── UI primitives ── */
+function Label({ children, error }) {
+  return (
+    <div style={{ fontSize: 10.5, color: error ? C.red : C.muted, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 5 }}>
+      {children}
+    </div>
+  );
+}
+
+function StyledInput({ value, onChange, suffix, type = 'number', min, max, step, error }) {
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        type={type}
+        value={value}
+        min={min} max={max} step={step}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          width: '100%',
+          background: error ? '#fdf0ee' : C.surface,
+          border: `1px solid ${error ? C.red : C.border}`,
+          color: C.brownMid, fontSize: 12.5,
+          padding: `7px ${suffix ? '36px' : '10px'} 7px 10px`,
+          fontFamily: 'inherit',
+        }}
+      />
+      {suffix && (
+        <span style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: C.muted, pointerEvents: 'none' }}>
+          {suffix}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function PctRow({ label, value, onChange, error }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
+      <span style={{ fontSize: 11.5, color: C.brownMid, flex: 1 }}>{label}</span>
+      <div style={{ position: 'relative', width: 78 }}>
+        <input
+          type="number" min="0" max="100" step="0.5"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          style={{
+            width: '100%', background: error ? '#fdf0ee' : C.surface,
+            border: `1px solid ${error ? C.red : C.border}`,
+            color: C.brownMid, fontSize: 12, padding: '5px 22px 5px 8px',
+            fontFamily: 'inherit', textAlign: 'right',
+          }}
+        />
+        <span style={{ position: 'absolute', right: 7, top: '50%', transform: 'translateY(-50%)', fontSize: 11, color: C.muted }}>%</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Control Panel ── */
+function ControlPanel({ params, setParams, onRun, lastRun, dirty }) {
+  const { totalUsers, budget, pcts, scene } = params;
+  const pctSum = pcts.reduce((a, b) => a + parseFloat(b || 0), 0);
+  const pctOk = Math.abs(pctSum - 100) < 0.01;
+
+  function setPct(i, v) {
+    const next = [...pcts];
+    next[i] = v;
+    setParams(p => ({ ...p, pcts: next }));
+  }
+
+  return (
+    <div style={{
+      width: 220, flexShrink: 0,
+      background: C.surface, borderRight: `1px solid ${C.border}`,
+      display: 'flex', flexDirection: 'column', height: '100%',
+    }}>
+      <div style={{ padding: '16px 18px 13px', borderBottom: `1px solid ${C.borderLight}` }}>
+        <div style={{ fontSize: 11, color: C.muted, letterSpacing: '0.06em', textTransform: 'uppercase' }}>仿真参数</div>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 18px 0' }}>
+        <div style={{ marginBottom: 16 }}>
+          <Label>场景选择</Label>
+          <div style={{ position: 'relative' }}>
+            <select
+              value={scene}
+              onChange={e => setParams(p => ({ ...p, scene: e.target.value }))}
+              style={{
+                width: '100%', appearance: 'none', WebkitAppearance: 'none',
+                background: C.surface, border: `1px solid ${C.border}`,
+                color: C.brownMid, fontSize: 12.5, padding: '7px 28px 7px 10px',
+                fontFamily: 'inherit',
+              }}>
+              <option>暴雨晚高峰</option>
+              <option>晴天午高峰</option>
+              <option>工作日早高峰</option>
+              <option>节假日高峰</option>
+            </select>
+            <svg style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
+              width="10" height="6" viewBox="0 0 10 6">
+              <path d="M0 0L5 6L10 0" fill="none" stroke={C.muted} strokeWidth="1.2" />
+            </svg>
+          </div>
+        </div>
+
+        <div style={{ borderTop: `1px solid ${C.borderLight}`, marginBottom: 16 }} />
+
+        <div style={{ marginBottom: 13 }}>
+          <Label>场景覆盖用户数</Label>
+          <StyledInput
+            value={totalUsers} suffix="人" type="number" min="100" max="100000" step="100"
+            onChange={v => setParams(p => ({ ...p, totalUsers: v }))}
+          />
+        </div>
+
+        <div style={{ marginBottom: 16 }}>
+          <Label>总补贴预算上限</Label>
+          <StyledInput
+            value={budget} suffix="万元" type="number" min="0.1" max="10" step="0.1"
+            onChange={v => setParams(p => ({ ...p, budget: v }))}
+          />
+        </div>
+
+        <div style={{ borderTop: `1px solid ${C.borderLight}`, marginBottom: 13 }} />
+
+        <div style={{ marginBottom: 12 }}>
+          <Label error={!pctOk}>画像簇占比</Label>
+          {getScene(scene).clusters.map((c, i) => (
+            <PctRow key={c.key} label={c.name} value={pcts[i]}
+              onChange={v => setPct(i, v)} error={!pctOk} />
+          ))}
+        </div>
+
+        <div style={{
+          marginBottom: 14,
+          background: pctOk ? C.borderLight : C.redBg,
+          padding: '8px 10px', fontSize: 10.5,
+          color: pctOk ? C.muted : C.red,
+          lineHeight: 1.6,
+          transition: 'background 0.2s',
+        }}>
+          当前总占比&nbsp;
+          <span style={{ color: pctOk ? C.brownMid : C.red, fontVariantNumeric: 'tabular-nums', fontWeight: 500 }}>
+            {pctSum.toFixed(1)}%
+          </span>
+          &nbsp;{pctOk ? '✓' : '— 需为100%'}
+        </div>
+      </div>
+
+      <div style={{ padding: '13px 18px 18px', borderTop: `1px solid ${C.borderLight}` }}>
+        <button
+          onClick={onRun}
+          disabled={!pctOk}
+          style={{
+            width: '100%', padding: '9px 0',
+            background: pctOk ? (dirty ? C.orange : C.brown) : C.muted,
+            color: '#faf8f5', border: 'none',
+            fontSize: 12.5, fontFamily: 'inherit',
+            cursor: pctOk ? 'pointer' : 'not-allowed',
+            letterSpacing: '0.04em',
+            transition: 'background 0.15s',
+          }}>
+          {dirty ? '● 运行仿真' : '运行仿真'}
+        </button>
+        <div style={{ marginTop: 7, fontSize: 10, color: C.mutedLight, textAlign: 'center' }}>
+          上次运行：{lastRun}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Cluster Cards ── */
+function ClusterCard({ meta, users, gtv, animate }) {
+  return (
+    <div style={{
+      flex: 1, background: C.surface, border: `1px solid ${C.border}`,
+      padding: '14px 15px',
+      transition: 'opacity 0.3s',
+      opacity: animate ? 0.6 : 1,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+        <span style={{ fontSize: 12, color: C.brownMid, fontWeight: 600 }}>{meta.name}</span>
+        <span style={{
+          fontSize: 10, color: C.orange, background: C.orangeBg,
+          padding: '2px 6px', fontWeight: 500, whiteSpace: 'nowrap',
+        }}>{meta.coupon}</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <div style={{ fontSize: 19, color: C.brown, fontWeight: 300, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+            {gtv.toFixed(1)}
+            <span style={{ fontSize: 11, color: C.muted, marginLeft: 2 }}>万元</span>
+          </div>
+          <div style={{ fontSize: 10, color: C.muted, marginTop: 3 }}>总GTV</div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 13, color: C.brownMid, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+            {Math.round(users).toLocaleString()}
+          </div>
+          <div style={{ fontSize: 10, color: C.muted, marginTop: 3 }}>用户数</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Chart ── */
+function Chart({ totalUsers, budget, scene, animate }) {
+  const W = 560, H = 260;
+  const padL = 60, padR = 28, padT = 24, padB = 44;
+
+  const totalUsersN = parseFloat(totalUsers) || 10000;
+  const budgetN = parseFloat(budget) || 5;
+
+  // Dynamic axis: scale by user count relative to 10000 baseline
+  const scale = totalUsersN / 10000;
+  const yMin = Math.floor(25 * scale / 5) * 5;
+  const yMax = Math.ceil(65 * scale / 5) * 5;
+  const xMax = 10;
+
+  function toS(x, y) {
+    const sx = padL + (x / xMax) * (W - padL - padR);
+    const sy = H - padB - ((y - yMin) / (yMax - yMin)) * (H - padT - padB);
+    return [sx, sy];
+  }
+
+  const pts = [];
+  for (let i = 0; i <= 120; i++) {
+    const b = (i / 120) * xMax;
+    pts.push([b, curveGTV(b, totalUsersN, scene)]);
+  }
+  const pathD = pts.map((p, i) => {
+    const [sx, sy] = toS(p[0], p[1]);
+    return `${i === 0 ? 'M' : 'L'}${sx.toFixed(2)},${Math.max(padT, Math.min(H - padB, sy)).toFixed(2)}`;
+  }).join(' ');
+
+  const optGTV = curveGTV(budgetN, totalUsersN, scene);
+  const baseGTV = baselineGTV(budgetN, totalUsersN, scene);
+  const pctGain = ((optGTV - baseGTV) / baseGTV * 100).toFixed(1);
+
+  const [ox, oy] = toS(budgetN, optGTV);
+  const [bx, by] = toS(budgetN, baseGTV);
+
+  const yStep = (yMax - yMin) / 5;
+  const yTicks = Array.from({ length: 6 }, (_, i) => Math.round(yMin + i * yStep));
+  const xTicks = [0, 2, 4, 6, 8, 10];
+
+  return (
+    <div style={{
+      background: C.surface, border: `1px solid ${C.border}`,
+      padding: '16px 18px 12px',
+      transition: 'opacity 0.3s', opacity: animate ? 0.6 : 1,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <span style={{ fontSize: 12, color: C.muted, letterSpacing: '0.03em' }}>补贴预算与GTV效益关系</span>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10.5, color: C.muted }}>
+            <svg width="18" height="8"><line x1="0" y1="4" x2="18" y2="4" stroke={C.brown} strokeWidth="1.8"/><circle cx="9" cy="4" r="3" fill={C.orange}/></svg>
+            最优方案
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10.5, color: C.muted }}>
+            <svg width="18" height="8"><line x1="0" y1="4" x2="18" y2="4" stroke={C.muted} strokeWidth="1" strokeDasharray="3,2"/><circle cx="9" cy="4" r="3" fill={C.surface} stroke={C.muted} strokeWidth="1.3"/></svg>
+            随机基线
+          </span>
+        </div>
+      </div>
+      <svg width={W} height={H} style={{ display: 'block', maxWidth: '100%' }}>
+        {yTicks.map(y => {
+          const [, sy] = toS(0, y);
+          return <line key={y} x1={padL} y1={sy} x2={W - padR} y2={sy} stroke={C.borderLight} strokeWidth={0.75} />;
+        })}
+
+        <path d={pathD} fill="none" stroke={C.brown} strokeWidth={2} />
+
+        {/* vertical dashed */}
+        <line x1={ox} y1={Math.min(oy, by)} x2={bx} y2={Math.max(oy, by)}
+          stroke={C.orange} strokeWidth={1} strokeDasharray="3,3" opacity={0.7} />
+
+        {/* gain label */}
+        {Math.abs(by - oy) > 18 && (
+          <>
+            <rect x={ox + 8} y={(oy + by) / 2 - 9} width={44} height={17} fill={C.orangeBgLight} />
+            <text x={ox + 8 + 22} y={(oy + by) / 2 + 4.5}
+              textAnchor="middle" fontSize={10.5} fill={C.orange} fontWeight="600">
+              +{pctGain}%
+            </text>
+          </>
+        )}
+
+        {/* baseline */}
+        <circle cx={bx} cy={by} r={4.5} fill={C.surface} stroke={C.muted} strokeWidth={1.5} />
+        <text x={bx - 9} y={by + 4} textAnchor="end" fontSize={10} fill={C.muted}>
+          {baseGTV.toFixed(1)}万
+        </text>
+
+        {/* optimal */}
+        <circle cx={ox} cy={oy} r={4.5} fill={C.orange} />
+        <text x={ox - 9} y={oy + 4} textAnchor="end" fontSize={10} fill={C.brown}>
+          {optGTV.toFixed(1)}万
+        </text>
+
+        {/* X axis */}
+        <line x1={padL} y1={H - padB} x2={W - padR} y2={H - padB} stroke={C.border} strokeWidth={1} />
+        {xTicks.map(x => {
+          const [sx] = toS(x, 0);
+          return (
+            <g key={x}>
+              <line x1={sx} y1={H - padB} x2={sx} y2={H - padB + 4} stroke={C.border} strokeWidth={1} />
+              <text x={sx} y={H - padB + 15} textAnchor="middle" fontSize={10} fill={C.muted}>{x}</text>
+            </g>
+          );
+        })}
+        <text x={padL + (W - padL - padR) / 2} y={H - 4} textAnchor="middle" fontSize={10} fill={C.muted}>
+          总补贴预算（万元）
+        </text>
+
+        {/* Y axis */}
+        <line x1={padL} y1={padT} x2={padL} y2={H - padB} stroke={C.border} strokeWidth={1} />
+        {yTicks.map(y => {
+          const [, sy] = toS(0, y);
+          return (
+            <g key={y}>
+              <line x1={padL - 4} y1={sy} x2={padL} y2={sy} stroke={C.border} strokeWidth={1} />
+              <text x={padL - 7} y={sy + 4} textAnchor="end" fontSize={10} fill={C.muted}>{y}</text>
+            </g>
+          );
+        })}
+        <text x={13} y={padT + (H - padT - padB) / 2} textAnchor="middle" fontSize={10} fill={C.muted}
+          transform={`rotate(-90, 13, ${padT + (H - padT - padB) / 2})`}>
+          总GTV（万元）
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+/* ── Summary Bar ── */
+function SummaryBar({ totalUsers, budget, pcts, scene, animate }) {
+  const totalUsersN = parseFloat(totalUsers) || 10000;
+  const budgetN = parseFloat(budget) || 5;
+  const optGTV = curveGTV(budgetN, totalUsersN, scene);
+  const baseGTV = baselineGTV(budgetN, totalUsersN, scene);
+  const pctGain = ((optGTV - baseGTV) / baseGTV * 100).toFixed(1);
+
+  const items = [
+    { label: '总GTV',     value: optGTV.toFixed(1),  unit: '万元', accent: false },
+    { label: '总补贴',    value: budgetN.toFixed(2),  unit: '万元', accent: false },
+    { label: 'vs 随机基线', value: `+${pctGain}%`, unit: '', accent: true },
+  ];
+  return (
+    <div style={{
+      display: 'flex', background: C.surface, border: `1px solid ${C.border}`,
+      transition: 'opacity 0.3s', opacity: animate ? 0.6 : 1,
+    }}>
+      {items.map((item, i) => (
+        <div key={item.label} style={{
+          flex: 1, padding: '15px 20px',
+          borderLeft: i > 0 ? `1px solid ${C.borderLight}` : 'none',
+        }}>
+          <div style={{ fontSize: 9.5, color: C.muted, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>
+            {item.label}
+          </div>
+          <div style={{
+            fontSize: 24, fontWeight: 300, lineHeight: 1,
+            color: item.accent ? C.orange : C.brown,
+            fontVariantNumeric: 'tabular-nums',
+          }}>
+            {item.value}
+            {item.unit && <span style={{ fontSize: 12, marginLeft: 3, color: item.accent ? C.orange : C.muted }}>{item.unit}</span>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Status Bar ── */
+function StatusBar({ scene, lastRun }) {
+  return (
+    <div style={{
+      height: 38, background: C.surface, borderBottom: `1px solid ${C.border}`,
+      display: 'flex', alignItems: 'center', paddingLeft: 20, paddingRight: 20,
+      gap: 8, flexShrink: 0,
+    }}>
+      <span style={{ fontSize: 11.5, fontWeight: 600, color: C.brown, letterSpacing: '-0.01em' }}>
+        券策略仿真看板
+      </span>
+      <span style={{ fontSize: 11, color: C.muted, marginLeft: 4 }}>{scene}场景</span>
+      <div style={{ flex: 1 }} />
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 5,
+        fontSize: 10.5, color: C.green, background: C.greenBg, padding: '3px 8px',
+      }}>
+        <svg width="7" height="7"><circle cx="3.5" cy="3.5" r="3.5" fill={C.green}/></svg>
+        仿真完成
+      </div>
+      <span style={{ fontSize: 10.5, color: C.muted }}>· {lastRun}</span>
+    </div>
+  );
+}
+
+/* ── App ── */
+function App() {
+  // draft: what the user is currently editing in the left panel
+  const [params, setParams] = useState({
+    scene: '暴雨晚高峰',
+    totalUsers: '10000',
+    budget: '5.0',
+    pcts: ['50', '12.5', '12.5', '25'],
+  });
+  // committed: the last params that were actually run — drives all result displays
+  const [committed, setCommitted] = useState({
+    scene: '暴雨晚高峰',
+    totalUsers: '10000',
+    budget: '5.0',
+    pcts: ['50', '12.5', '12.5', '25'],
+  });
+  const [animating, setAnimating] = useState(false);
+  const [lastRun, setLastRun] = useState('2026-04-18 22:47');
+  const [dirty, setDirty] = useState(false);
+
+  // Mark dirty whenever draft diverges from committed
+  useEffect(() => {
+    const changed =
+      params.scene !== committed.scene ||
+      params.totalUsers !== committed.totalUsers ||
+      params.budget !== committed.budget ||
+      params.pcts.some((v, i) => v !== committed.pcts[i]);
+    setDirty(changed);
+  }, [params, committed]);
+
+  function computeResults(p) {
+    const totalUsersN = parseFloat(p.totalUsers) || 10000;
+    return getScene(p.scene).clusters.map((meta, i) => {
+      const pct = parseFloat(p.pcts[i]) || 0;
+      const users = totalUsersN * pct / 100;
+      const gtv = (users * meta.gtvRate) / 10000;
+      return { meta, users, gtv };
+    });
+  }
+
+  function handleRun() {
+    setAnimating(true);
+    setTimeout(() => {
+      setCommitted({ ...params });
+      const now = new Date();
+      setLastRun(`2026-04-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`);
+      setAnimating(false);
+      setDirty(false);
+    }, 600);
+  }
+
+  const clusterResults = computeResults(committed);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: C.bg }}>
+      <StatusBar scene={params.scene} lastRun={lastRun} />
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <ControlPanel params={params} setParams={setParams} onRun={handleRun} lastRun={lastRun} dirty={dirty} />
+        <div style={{ flex: 1, overflowY: 'auto', padding: '18px 22px 22px' }}>
+          {/* Cluster cards */}
+          <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+            {clusterResults.map(r => (
+              <ClusterCard key={r.meta.key} meta={r.meta} users={r.users} gtv={r.gtv} animate={animating} />
+            ))}
+          </div>
+          {/* Chart */}
+          <div style={{ marginBottom: 14 }}>
+            <Chart totalUsers={committed.totalUsers} budget={committed.budget} scene={committed.scene} animate={animating} />
+          </div>
+          {/* Summary */}
+          <SummaryBar totalUsers={committed.totalUsers} budget={committed.budget} pcts={committed.pcts} scene={committed.scene} animate={animating} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
