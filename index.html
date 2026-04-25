@@ -97,6 +97,19 @@
   @keyframes tp { 0%,100%{transform:scale(1);opacity:.7} 50%{transform:scale(1.15);opacity:1} }
 
   .vis-p { background:linear-gradient(160deg,#F5D5CC,#EDBFB5); }
+
+  .vis-j { background:linear-gradient(160deg,#FDE8D8,#F5D4B8); }
+  .jy-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px; }
+  .jy-phone { width:80px; height:140px; border-radius:16px; border:2px solid rgba(212,102,58,.35); background:rgba(255,255,255,.7); display:flex; flex-direction:column; align-items:center; padding:12px 6px; gap:6px; position:relative; }
+  .jy-notch { width:28px; height:4px; border-radius:4px; background:rgba(212,102,58,.2); }
+  .jy-pill { width:90%; height:8px; border-radius:4px; }
+  .jy-pill:nth-child(2){background:rgba(212,102,58,.25)} .jy-pill:nth-child(3){background:rgba(42,157,143,.25)} .jy-pill:nth-child(4){background:rgba(228,168,83,.25)}
+  .jy-btn { width:70%; height:10px; border-radius:5px; background:rgba(212,102,58,.35); margin-top:auto; }
+  .jy-users { display:flex; gap:-4px; margin-top:4px; }
+  .jy-avatar { width:24px; height:24px; border-radius:50%; border:2px solid rgba(255,255,255,.8); display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .jy-avatar:nth-child(1){background:rgba(212,102,58,.2);} .jy-avatar:nth-child(2){background:rgba(42,157,143,.2); margin-left:-6px;} .jy-avatar:nth-child(3){background:rgba(228,168,83,.2); margin-left:-6px;}
+  .jy-arrow { font-size:10px; color:rgba(212,102,58,.4); animation:jy-pulse 2s ease-in-out infinite; }
+  @keyframes jy-pulse { 0%,100%{opacity:.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
   .dstk { display:flex; flex-direction:column; gap:8px; transform:perspective(600px) rotateX(5deg); }
   .di { width:120px; padding:8px 12px; background:rgba(196,69,54,.08); border:1px solid rgba(196,69,54,.2); border-radius:8px; display:flex; align-items:center; gap:8px; animation:dsl .6s ease-out both; }
   .di:nth-child(1){animation-delay:.1s} .di:nth-child(2){animation-delay:.25s} .di:nth-child(3){animation-delay:.4s}
@@ -182,6 +195,7 @@
   <p class="hero-bio">关注 AI 技术在产品场景中的落地，擅长用 LLM Agent、深度学习等技术构建解决真实业务问题的产品方案。</p>
   <div class="hero-tags">
     <span class="hero-tag">LLM Agent</span>
+    <span class="hero-tag">产品设计</span>
     <span class="hero-tag">用户行为仿真</span>
     <span class="hero-tag">深度学习部署</span>
     <span class="hero-tag">数据分析</span>
@@ -225,6 +239,37 @@
 <section class="sec">
   <div class="sec-h"><span class="sec-n">02</span><span class="sec-t">更多项目</span><div class="sec-r"></div></div>
   <div class="pgrid">
+
+    <a href="projects/jiayaofang.html" class="pcard fu">
+      <div class="cvis vis-j">
+        <div class="jy-wrap">
+          <div class="jy-phone">
+            <div class="jy-notch"></div>
+            <div class="jy-pill"></div>
+            <div class="jy-pill"></div>
+            <div class="jy-pill"></div>
+            <div class="jy-btn"></div>
+          </div>
+          <div class="jy-users">
+            <div class="jy-avatar">👩</div>
+            <div class="jy-avatar">👦</div>
+            <div class="jy-avatar">👧</div>
+          </div>
+          <div class="jy-arrow">▲ 协同管理</div>
+        </div>
+      </div>
+      <div class="cc">
+        <div class="ct ct1">产品设计 · 美团笔试 · 2026.04</div>
+        <h3 class="ch">家药方 · 慢病用药家庭管理平台</h3>
+        <p class="cd">针对异地子女远程代管父母用药的场景，解决医嘱信息链断裂、多子女责任分散的核心痛点。不做"吃药闹钟"，而是让用药方案在家庭成员间清晰可懂、实时同步。</p>
+        <div class="tgs"><span class="tg">产品设计</span><span class="tg">用户调研</span><span class="tg">信息架构</span><span class="tg">交互原型</span></div>
+        <div class="ms">
+          <div class="m"><span class="mv mv1">双端</span><span class="ml">子女管理+老人极简</span></div>
+          <div class="m"><span class="mv mv1">5 模块</span><span class="ml">完整功能闭环</span></div>
+        </div>
+        <div class="cta">查看交互原型 <span class="cta-arr">→</span></div>
+      </div>
+    </a>
 
     <a href="https://github.com/VincenteXk/JoySeeker-AI-Drone/" target="_blank" class="pcard fu">
       <div class="cvis vis-d">
@@ -293,6 +338,7 @@
     <div class="sc"><span class="sd sd2"></span>深度学习</div>
     <div class="sc"><span class="sd sd2"></span>LLM Agent</div>
     <div class="sc"><span class="sd sd3"></span>提示词工程</div>
+    <div class="sc"><span class="sd sd1"></span>产品设计</div>
     <div class="sc"><span class="sd sd3"></span>数据分析</div>
     <div class="sc"><span class="sd sd4"></span>IELTS 7.5</div>
   </div>
